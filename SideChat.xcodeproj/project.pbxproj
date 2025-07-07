@@ -1,0 +1,556 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		8D564AA92E1BF83D0086C89B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8D564A922E1BF83C0086C89B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D564A992E1BF83C0086C89B;
+			remoteInfo = SideChat;
+		};
+		8D564AB32E1BF83D0086C89B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8D564A922E1BF83C0086C89B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D564A992E1BF83C0086C89B;
+			remoteInfo = SideChat;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		8D564A9A2E1BF83C0086C89B /* SideChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SideChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D564AA82E1BF83D0086C89B /* SideChatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SideChatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D564AB22E1BF83D0086C89B /* SideChatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SideChatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		8D564A9C2E1BF83C0086C89B /* SideChat */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SideChat;
+			sourceTree = "<group>";
+		};
+		8D564AAB2E1BF83D0086C89B /* SideChatTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SideChatTests;
+			sourceTree = "<group>";
+		};
+		8D564AB52E1BF83D0086C89B /* SideChatUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SideChatUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D564A972E1BF83C0086C89B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D564AA52E1BF83D0086C89B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D564AAF2E1BF83D0086C89B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8D564A912E1BF83C0086C89B = {
+			isa = PBXGroup;
+			children = (
+				8D564A9C2E1BF83C0086C89B /* SideChat */,
+				8D564AAB2E1BF83D0086C89B /* SideChatTests */,
+				8D564AB52E1BF83D0086C89B /* SideChatUITests */,
+				8D564A9B2E1BF83C0086C89B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8D564A9B2E1BF83C0086C89B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D564A9A2E1BF83C0086C89B /* SideChat.app */,
+				8D564AA82E1BF83D0086C89B /* SideChatTests.xctest */,
+				8D564AB22E1BF83D0086C89B /* SideChatUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D564A992E1BF83C0086C89B /* SideChat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D564ABC2E1BF83D0086C89B /* Build configuration list for PBXNativeTarget "SideChat" */;
+			buildPhases = (
+				8D564A962E1BF83C0086C89B /* Sources */,
+				8D564A972E1BF83C0086C89B /* Frameworks */,
+				8D564A982E1BF83C0086C89B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8D564A9C2E1BF83C0086C89B /* SideChat */,
+			);
+			name = SideChat;
+			packageProductDependencies = (
+			);
+			productName = SideChat;
+			productReference = 8D564A9A2E1BF83C0086C89B /* SideChat.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8D564AA72E1BF83D0086C89B /* SideChatTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D564ABF2E1BF83D0086C89B /* Build configuration list for PBXNativeTarget "SideChatTests" */;
+			buildPhases = (
+				8D564AA42E1BF83D0086C89B /* Sources */,
+				8D564AA52E1BF83D0086C89B /* Frameworks */,
+				8D564AA62E1BF83D0086C89B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8D564AAA2E1BF83D0086C89B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8D564AAB2E1BF83D0086C89B /* SideChatTests */,
+			);
+			name = SideChatTests;
+			packageProductDependencies = (
+			);
+			productName = SideChatTests;
+			productReference = 8D564AA82E1BF83D0086C89B /* SideChatTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		8D564AB12E1BF83D0086C89B /* SideChatUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D564AC22E1BF83D0086C89B /* Build configuration list for PBXNativeTarget "SideChatUITests" */;
+			buildPhases = (
+				8D564AAE2E1BF83D0086C89B /* Sources */,
+				8D564AAF2E1BF83D0086C89B /* Frameworks */,
+				8D564AB02E1BF83D0086C89B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8D564AB42E1BF83D0086C89B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				8D564AB52E1BF83D0086C89B /* SideChatUITests */,
+			);
+			name = SideChatUITests;
+			packageProductDependencies = (
+			);
+			productName = SideChatUITests;
+			productReference = 8D564AB22E1BF83D0086C89B /* SideChatUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8D564A922E1BF83C0086C89B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					8D564A992E1BF83C0086C89B = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					8D564AA72E1BF83D0086C89B = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 8D564A992E1BF83C0086C89B;
+					};
+					8D564AB12E1BF83D0086C89B = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 8D564A992E1BF83C0086C89B;
+					};
+				};
+			};
+			buildConfigurationList = 8D564A952E1BF83C0086C89B /* Build configuration list for PBXProject "SideChat" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8D564A912E1BF83C0086C89B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8D564A9B2E1BF83C0086C89B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D564A992E1BF83C0086C89B /* SideChat */,
+				8D564AA72E1BF83D0086C89B /* SideChatTests */,
+				8D564AB12E1BF83D0086C89B /* SideChatUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D564A982E1BF83C0086C89B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D564AA62E1BF83D0086C89B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D564AB02E1BF83D0086C89B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D564A962E1BF83C0086C89B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D564AA42E1BF83D0086C89B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D564AAE2E1BF83D0086C89B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8D564AAA2E1BF83D0086C89B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D564A992E1BF83C0086C89B /* SideChat */;
+			targetProxy = 8D564AA92E1BF83D0086C89B /* PBXContainerItemProxy */;
+		};
+		8D564AB42E1BF83D0086C89B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D564A992E1BF83C0086C89B /* SideChat */;
+			targetProxy = 8D564AB32E1BF83D0086C89B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		8D564ABA2E1BF83D0086C89B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		8D564ABB2E1BF83D0086C89B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		8D564ABD2E1BF83D0086C89B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SideChat/SideChat.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.armaangupta57.SideChat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		8D564ABE2E1BF83D0086C89B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SideChat/SideChat.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.armaangupta57.SideChat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8D564AC02E1BF83D0086C89B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.armaangupta57.SideChatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SideChat.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SideChat";
+			};
+			name = Debug;
+		};
+		8D564AC12E1BF83D0086C89B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.armaangupta57.SideChatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SideChat.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SideChat";
+			};
+			name = Release;
+		};
+		8D564AC32E1BF83D0086C89B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.armaangupta57.SideChatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = SideChat;
+			};
+			name = Debug;
+		};
+		8D564AC42E1BF83D0086C89B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3Z8BWG9G9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.armaangupta57.SideChatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = SideChat;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8D564A952E1BF83C0086C89B /* Build configuration list for PBXProject "SideChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D564ABA2E1BF83D0086C89B /* Debug */,
+				8D564ABB2E1BF83D0086C89B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D564ABC2E1BF83D0086C89B /* Build configuration list for PBXNativeTarget "SideChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D564ABD2E1BF83D0086C89B /* Debug */,
+				8D564ABE2E1BF83D0086C89B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D564ABF2E1BF83D0086C89B /* Build configuration list for PBXNativeTarget "SideChatTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D564AC02E1BF83D0086C89B /* Debug */,
+				8D564AC12E1BF83D0086C89B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D564AC22E1BF83D0086C89B /* Build configuration list for PBXNativeTarget "SideChatUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D564AC32E1BF83D0086C89B /* Debug */,
+				8D564AC42E1BF83D0086C89B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8D564A922E1BF83C0086C89B /* Project object */;
+}
