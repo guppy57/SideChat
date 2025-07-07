@@ -1,0 +1,18 @@
+"/Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-syntax/Sources/SwiftParser/TriviaParser.swift":
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TriviaParser.swiftdeps"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TriviaParser.o"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TriviaParser.d"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TriviaParser.dia"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TriviaParser.swiftconstvalues"
+"/Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-syntax/Sources/SwiftParser/TopLevel.swift":
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TopLevel.swiftdeps"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TopLevel.d"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TopLevel.dia"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TopLevel.o"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TopLevel.swiftconstvalues"
+"/Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-syntax/Sources/SwiftParser/TokenSpecSet.swift":
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TokenSpecSet.swiftdeps"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TokenSpecSet.d"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TokenSpecSet.dia"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TokenSpecSet.swiftconstvalues"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/swift-syntax.build/Debug/SwiftParser.build/Objects-normal/arm64/TokenSpecSet.o"

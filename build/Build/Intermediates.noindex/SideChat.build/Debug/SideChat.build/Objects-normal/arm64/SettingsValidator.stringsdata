@@ -1,0 +1,48 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Utilities/SettingsValidator.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Settings Issues Found",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 356
+        }
+      },
+      {
+        "comment": "",
+        "key": "Repair",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 362
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dismiss",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 366
+        }
+      },
+      {
+        "comment": "",
+        "key": "• and %lld more...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 379
+        }
+      },
+      {
+        "comment": "",
+        "key": "• %@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 373
+        }
+      }
+    ]
+  },
+  "version": 1
+}

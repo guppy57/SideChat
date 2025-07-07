@@ -1,0 +1,40 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Extensions/View+BlurredBackground.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Input Field Example",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chat Bubble (User)",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 169
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chat Bubble (Assistant)",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 172
+        }
+      },
+      {
+        "comment": "",
+        "key": "Toolbar",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 177
+        }
+      }
+    ]
+  },
+  "version": 1
+}

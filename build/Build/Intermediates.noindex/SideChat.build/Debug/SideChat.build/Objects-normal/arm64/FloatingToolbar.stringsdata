@@ -1,0 +1,16 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Views/FloatingToolbar.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Type a message...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 178
+        }
+      }
+    ]
+  },
+  "version": 1
+}

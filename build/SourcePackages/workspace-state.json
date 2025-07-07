@@ -1,0 +1,183 @@
+{
+  "object" : {
+    "artifacts" : [
+
+    ],
+    "dependencies" : [
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "defaults",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/sindresorhus/Defaults",
+          "name" : "Defaults"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "00c82eff4550c87cf9c547d7e5493a6a97837061",
+            "version" : "9.0.3"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "Defaults"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "keyboardshortcuts",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
+          "name" : "KeyboardShortcuts"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "045cf174010beb335fa1d2567d18c057b8787165",
+            "version" : "2.3.0"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "KeyboardShortcuts"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "keychainaccess",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
+          "name" : "KeychainAccess"
+        },
+        "state" : {
+          "checkoutState" : {
+            "branch" : "master",
+            "revision" : "e0c7eebc5a4465a3c4680764f26b7a61f567cdaf"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "KeychainAccess"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "launchatlogin-modern",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/sindresorhus/LaunchAtLogin-Modern",
+          "name" : "LaunchAtLogin-Modern"
+        },
+        "state" : {
+          "checkoutState" : {
+            "branch" : "main",
+            "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "LaunchAtLogin-Modern"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "networkimage",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/gonzalezreal/NetworkImage",
+          "name" : "NetworkImage"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "2849f5323265386e200484b0d0f896e73c3411b9",
+            "version" : "6.0.1"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "NetworkImage"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "sqlite.swift",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/stephencelis/SQLite.swift",
+          "name" : "SQLite.swift"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "392dd6058624d9f6c5b4c769d165ddd8c7293394",
+            "version" : "0.15.4"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "SQLite.swift"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "swift-cmark",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/swiftlang/swift-cmark",
+          "name" : "swift-cmark"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "b022b08312decdc46585e0b3440d97f6f22ef703",
+            "version" : "0.6.0"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "swift-cmark"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "swift-markdown-ui",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/gonzalezreal/swift-markdown-ui",
+          "name" : "swift-markdown-ui"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "5f613358148239d0292c0cef674a3c2314737f9e",
+            "version" : "2.4.1"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "swift-markdown-ui"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "swift-syntax",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/swiftlang/swift-syntax",
+          "name" : "swift-syntax"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "f99ae8aa18f0cf0d53481901f88a0991dc3bd4a2",
+            "version" : "601.0.1"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "swift-syntax"
+      },
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "swift-toolchain-sqlite",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/swiftlang/swift-toolchain-sqlite",
+          "name" : "swift-toolchain-sqlite"
+        },
+        "state" : {
+          "checkoutState" : {
+            "revision" : "b626d3002773b1a1304166643e7f118f724b2132",
+            "version" : "1.0.4"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "swift-toolchain-sqlite"
+      }
+    ],
+    "prebuilts" : [
+
+    ]
+  },
+  "version" : 7
+}

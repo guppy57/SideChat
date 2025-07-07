@@ -1,0 +1,64 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Views/SidebarView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "New Chat",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chat History",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type a message...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unpin Sidebar",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pin Sidebar",
+        "location": {
+          "startingColumn": 90,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 70
+        }
+      },
+      {
+        "comment": "",
+        "key": "Send Message",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 83
+        }
+      }
+    ]
+  },
+  "version": 1
+}

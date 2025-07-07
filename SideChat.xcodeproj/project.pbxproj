@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8D564AC72E1C059A0086C89B /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 8D564AC62E1C059A0086C89B /* Defaults */; };
+		8D564AC92E1C059A0086C89B /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 8D564AC82E1C059A0086C89B /* DefaultsMacros */; };
+		8D564ACC2E1C05EC0086C89B /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 8D564ACB2E1C05EC0086C89B /* LaunchAtLogin */; };
+		8D564ACF2E1C060B0086C89B /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 8D564ACE2E1C060B0086C89B /* SQLite */; };
+		8D564AD22E1C062C0086C89B /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 8D564AD12E1C062C0086C89B /* KeychainAccess */; };
+		8D564AD52E1C06660086C89B /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 8D564AD42E1C06660086C89B /* KeyboardShortcuts */; };
+		8D564AD82E1C067E0086C89B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8D564AD72E1C067E0086C89B /* MarkdownUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		8D564AA92E1BF83D0086C89B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +62,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D564ACF2E1C060B0086C89B /* SQLite in Frameworks */,
+				8D564AD82E1C067E0086C89B /* MarkdownUI in Frameworks */,
+				8D564ACC2E1C05EC0086C89B /* LaunchAtLogin in Frameworks */,
+				8D564AC72E1C059A0086C89B /* Defaults in Frameworks */,
+				8D564AC92E1C059A0086C89B /* DefaultsMacros in Frameworks */,
+				8D564AD22E1C062C0086C89B /* KeychainAccess in Frameworks */,
+				8D564AD52E1C06660086C89B /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +129,13 @@
 			);
 			name = SideChat;
 			packageProductDependencies = (
+				8D564AC62E1C059A0086C89B /* Defaults */,
+				8D564AC82E1C059A0086C89B /* DefaultsMacros */,
+				8D564ACB2E1C05EC0086C89B /* LaunchAtLogin */,
+				8D564ACE2E1C060B0086C89B /* SQLite */,
+				8D564AD12E1C062C0086C89B /* KeychainAccess */,
+				8D564AD42E1C06660086C89B /* KeyboardShortcuts */,
+				8D564AD72E1C067E0086C89B /* MarkdownUI */,
 			);
 			productName = SideChat;
 			productReference = 8D564A9A2E1BF83C0086C89B /* SideChat.app */;
@@ -195,6 +219,14 @@
 			);
 			mainGroup = 8D564A912E1BF83C0086C89B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8D564AC52E1C059A0086C89B /* XCRemoteSwiftPackageReference "Defaults" */,
+				8D564ACA2E1C05EC0086C89B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				8D564ACD2E1C060B0086C89B /* XCRemoteSwiftPackageReference "SQLite" */,
+				8D564AD02E1C062C0086C89B /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				8D564AD32E1C06660086C89B /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				8D564AD62E1C067E0086C89B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8D564A9B2E1BF83C0086C89B /* Products */;
 			projectDirPath = "";
@@ -551,6 +583,95 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8D564AC52E1C059A0086C89B /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.3;
+			};
+		};
+		8D564ACA2E1C05EC0086C89B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		8D564ACD2E1C060B0086C89B /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.4;
+			};
+		};
+		8D564AD02E1C062C0086C89B /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		8D564AD32E1C06660086C89B /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
+		8D564AD62E1C067E0086C89B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8D564AC62E1C059A0086C89B /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D564AC52E1C059A0086C89B /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
+		};
+		8D564AC82E1C059A0086C89B /* DefaultsMacros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D564AC52E1C059A0086C89B /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = DefaultsMacros;
+		};
+		8D564ACB2E1C05EC0086C89B /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D564ACA2E1C05EC0086C89B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
+		8D564ACE2E1C060B0086C89B /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D564ACD2E1C060B0086C89B /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
+		};
+		8D564AD12E1C062C0086C89B /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D564AD02E1C062C0086C89B /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		8D564AD42E1C06660086C89B /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D564AD32E1C06660086C89B /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		8D564AD72E1C067E0086C89B /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D564AD62E1C067E0086C89B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8D564A922E1BF83C0086C89B /* Project object */;
 }

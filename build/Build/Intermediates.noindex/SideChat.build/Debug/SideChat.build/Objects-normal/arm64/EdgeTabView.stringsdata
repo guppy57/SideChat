@@ -1,0 +1,16 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Views/EdgeTabView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Click to show SideChat",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 42
+        }
+      }
+    ]
+  },
+  "version": 1
+}

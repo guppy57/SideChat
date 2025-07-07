@@ -1,0 +1,27 @@
+moduledependenciestarget: \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/module.modulemap \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk/usr/include/c_standard_library.modulemap \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk/usr/include/DarwinFoundation.modulemap \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/module.modulemap \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/export.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm_version.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/cmark-gfm-extension_api.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/buffer.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/chunk.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/cmark_ctype.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/footnotes.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/map.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/houdini.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/html.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/node.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/inlines.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/references.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/iterator.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/parser.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/plugin.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/registry.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/render.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/scanners.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/syntax_extension.h \
+  /Users/guppy57/GitHub/SideChat/build/SourcePackages/checkouts/swift-cmark/src/include/utf8.h
