@@ -157,15 +157,15 @@ struct BubbleBackground: View {
                     
                     // White base overlay with higher opacity
                     BubbleShape(isFromUser: isUser)
-                        .fill(Color.white.opacity(0.5))
+                        .fill(Color.white.opacity(0.6))
                     
                     // Light gradient for subtle depth
                     BubbleShape(isFromUser: isUser)
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(0.3),
-                                    Color.white.opacity(0.1)
+                                    Color.white.opacity(0.4),
+                                    Color.white.opacity(0.15)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -177,7 +177,7 @@ struct BubbleBackground: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(0.35),
+                                    Color.white.opacity(0.45),
                                     Color.clear
                                 ],
                                 startPoint: .top,

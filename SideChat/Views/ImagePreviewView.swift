@@ -73,6 +73,191 @@ struct ImagePreviewView: View {
     }
 }
 
+// MARK: - Inline Image Preview
+
+/// Minimal image preview for inside the input field
+struct InlineImagePreview: View {
+    let imageData: Data
+    let onRemove: () -> Void
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            if let nsImage = NSImage(data: imageData) {
+                Image(nsImage: nsImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                    )
+                    .overlay(
+                        // Small remove button
+                        Button(action: onRemove) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 14))
+                                .foregroundColor(.white)
+                                .background(
+                                    Circle()
+                                        .fill(Color.black.opacity(0.6))
+                                        .frame(width: 18, height: 18)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .offset(x: -4, y: 4),
+                        alignment: .topTrailing
+                    )
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+}
+
+// MARK: - Inline Images Preview with Wrapping
+
+/// Preview for multiple images with wrapping layout inside the input field
+struct InlineImagesPreview: View {
+    @Binding var images: [Data]
+    
+    var body: some View {
+        WrappingHStack(alignment: .bottom, spacing: 8) {
+            ForEach(Array(images.enumerated()), id: \.offset) { index, imageData in
+                if let nsImage = NSImage(data: imageData) {
+                    let aspectRatio = nsImage.size.width / nsImage.size.height
+                    
+                    Image(nsImage: nsImage)
+                        .resizable()
+                        .aspectRatio(aspectRatio, contentMode: .fit)
+                        .frame(width: 60 * aspectRatio, height: 60)
+                        .clipped()
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                        )
+                        .overlay(
+                            // Small remove button
+                            Button(action: { removeImage(at: index) }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.black.opacity(0.6))
+                                            .frame(width: 18, height: 18)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .offset(x: -4, y: 4),
+                            alignment: .topTrailing
+                        )
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+    
+    private func removeImage(at index: Int) {
+        guard images.indices.contains(index) else { return }
+        _ = withAnimation(.easeInOut(duration: 0.2)) {
+            images.remove(at: index)
+        }
+    }
+}
+
+// MARK: - Wrapping HStack Layout
+
+/// Custom layout that wraps content to new rows when it exceeds available width
+struct WrappingHStack: Layout {
+    var alignment: VerticalAlignment = .center
+    var spacing: CGFloat = 8
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = FlowResult(
+            in: proposal.replacingUnspecifiedDimensions().width,
+            subviews: subviews,
+            alignment: alignment,
+            spacing: spacing
+        )
+        return result.size
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = FlowResult(
+            in: bounds.width,
+            subviews: subviews,
+            alignment: alignment,
+            spacing: spacing
+        )
+        
+        for (index, subview) in subviews.enumerated() {
+            subview.place(at: CGPoint(x: result.positions[index].x + bounds.minX,
+                                     y: result.positions[index].y + bounds.minY),
+                         proposal: .unspecified)
+        }
+    }
+    
+    struct FlowResult {
+        var size: CGSize = .zero
+        var positions: [CGPoint] = []
+        
+        init(in maxWidth: CGFloat, subviews: Subviews, alignment: VerticalAlignment, spacing: CGFloat) {
+            var currentX: CGFloat = 0
+            var currentY: CGFloat = 0
+            var lineHeight: CGFloat = 0
+            var positions: [CGPoint] = []
+            var rowRanges: [(start: Int, end: Int, height: CGFloat)] = []
+            var currentRowStart = 0
+            
+            for (index, subview) in subviews.enumerated() {
+                let size = subview.sizeThatFits(.unspecified)
+                
+                if currentX + size.width > maxWidth && currentX > 0 {
+                    // Save current row info
+                    rowRanges.append((start: currentRowStart, end: index - 1, height: lineHeight))
+                    
+                    // Wrap to next line
+                    currentX = 0
+                    currentY += lineHeight + spacing
+                    lineHeight = 0
+                    currentRowStart = index
+                }
+                
+                positions.append(CGPoint(x: currentX, y: currentY))
+                lineHeight = max(lineHeight, size.height)
+                currentX += size.width + spacing
+                
+                self.size.width = max(self.size.width, currentX - spacing)
+            }
+            
+            // Don't forget the last row
+            if currentRowStart < subviews.count {
+                rowRanges.append((start: currentRowStart, end: subviews.count - 1, height: lineHeight))
+            }
+            
+            self.size.height = currentY + lineHeight
+            
+            // Adjust Y positions for bottom alignment within each row
+            if alignment == .bottom {
+                for row in rowRanges {
+                    for i in row.start...row.end {
+                        let subview = subviews[i]
+                        let size = subview.sizeThatFits(.unspecified)
+                        positions[i].y += row.height - size.height
+                    }
+                }
+            }
+            
+            self.positions = positions
+        }
+    }
+}
+
 // MARK: - Multiple Images Preview
 
 /// Container for previewing multiple images

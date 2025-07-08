@@ -14,7 +14,7 @@ struct SidebarView: View {
     @Default(.enableImageUploads) private var enableImageUploads
     @State private var messageText = ""
     @State private var currentChatId = UUID() // TODO: Load from database or create new
-    @State private var selectedImageData: Data? = nil
+    @State private var selectedImages: [Data] = []
     @State private var showImagePicker = false
     @State private var isDragTargeted = false
     
@@ -25,18 +25,18 @@ struct SidebarView: View {
             // Main content area with chat view
             ChatView(chatId: currentChatId)
             
-            // Image preview if present
-            if let imageData = selectedImageData {
-                ImagePreviewView(imageData: imageData) {
-                    selectedImageData = nil
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-            
             // Combined input and toolbar area - iMessage style
-            HStack(spacing: 8) {
+            VStack(spacing: 0) {
+                // Inline image preview if present
+                if !selectedImages.isEmpty {
+                    InlineImagesPreview(images: $selectedImages)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .top).combined(with: .opacity),
+                            removal: .scale(scale: 0.8).combined(with: .opacity)
+                        ))
+                }
+                
+                HStack(spacing: 8) {
                 // Left toolbar buttons
                 Button(action: createNewChat) {
                     Image(systemName: "plus.bubble")
@@ -107,10 +107,11 @@ struct SidebarView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .help("Send Message")
-                .disabled(messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && selectedImages.isEmpty)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
             .background(
                 ZStack {
                     // Solid background for better contrast
@@ -137,6 +138,7 @@ struct SidebarView: View {
             )
             .padding(16)
             .animation(.easeInOut(duration: 0.2), value: messageText)
+            .animation(.easeInOut(duration: 0.2), value: selectedImages)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.clear) // Completely transparent background
@@ -159,7 +161,7 @@ struct SidebarView: View {
             }
         }
         .background {
-            ImagePickerView(selectedImageData: $selectedImageData, isPresented: $showImagePicker)
+            ImagePickerView(selectedImages: $selectedImages, isPresented: $showImagePicker)
         }
         .onReceive(NotificationCenter.default.publisher(for: .paste)) { _ in
             handlePaste()
@@ -202,25 +204,23 @@ struct SidebarView: View {
     private func sendMessage() {
         // TODO: Implement message sending to LLM
         let trimmedMessage = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmedMessage.isEmpty || selectedImageData != nil {
+        if !trimmedMessage.isEmpty || !selectedImages.isEmpty {
             print("Sending message: \(trimmedMessage)")
-            if let imageData = selectedImageData {
-                print("With image of size: \(imageData.count) bytes")
+            if !selectedImages.isEmpty {
+                print("With \(selectedImages.count) image(s)")
+                for (index, imageData) in selectedImages.enumerated() {
+                    print("  Image \(index + 1): \(imageData.count) bytes")
+                }
             }
             messageText = "" // Clear the input field
-            selectedImageData = nil // Clear the image
+            selectedImages.removeAll() // Clear all images
         }
     }
     
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         guard enableImageUploads else { return false }
         
-        let dropDelegate = ImageDropDelegate(
-            droppedImageData: $selectedImageData,
-            isDragTargeted: $isDragTargeted
-        )
-        
-        // Use the drop delegate's logic
+        // Handle image drop
         for provider in providers {
             if provider.hasItemConformingToTypeIdentifier("public.image") {
                 provider.loadDataRepresentation(forTypeIdentifier: "public.image") { data, error in
@@ -228,7 +228,7 @@ struct SidebarView: View {
                         if let data = data,
                            data.count <= 20 * 1024 * 1024, // 20MB limit
                            NSImage(data: data) != nil {
-                            selectedImageData = data
+                            selectedImages.append(data)
                         }
                         isDragTargeted = false
                     }
@@ -244,7 +244,7 @@ struct SidebarView: View {
         guard enableImageUploads else { return }
         
         if let imageData = ClipboardImageHandler.getImageFromClipboard() {
-            selectedImageData = imageData
+            selectedImages.append(imageData)
         }
     }
 }

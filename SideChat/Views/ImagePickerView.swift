@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 
 /// A SwiftUI wrapper for NSOpenPanel to select image files
 struct ImagePickerView: NSViewRepresentable {
-    @Binding var selectedImageData: Data?
+    @Binding var selectedImages: [Data]
     @Binding var isPresented: Bool
     let maxFileSize: Int = 20 * 1024 * 1024 // 20MB
     
@@ -23,8 +23,14 @@ struct ImagePickerView: NSViewRepresentable {
     }
     
     private func showImagePicker() {
+        // Store current pin state and temporarily pin sidebar
+        let wasOriginallyPinned = SidebarWindowController.shared.isSidebarPinned
+        if !wasOriginallyPinned {
+            SidebarWindowController.shared.setSidebarPinned(true)
+        }
+        
         let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = false
+        openPanel.allowsMultipleSelection = true
         openPanel.canChooseDirectories = false
         openPanel.canChooseFiles = true
         openPanel.allowedContentTypes = [
@@ -37,33 +43,48 @@ struct ImagePickerView: NSViewRepresentable {
             .webP,
             UTType(filenameExtension: "jpg")!
         ]
-        openPanel.title = "Select an Image"
-        openPanel.message = "Choose an image to send (max 20MB)"
+        openPanel.title = "Select Images"
+        openPanel.message = "Choose one or more images to send (max 20MB each)"
         openPanel.prompt = "Select"
         
         openPanel.begin { response in
-            if response == .OK, let url = openPanel.url {
-                // Check file size
-                if let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
-                   let fileSize = attributes[.size] as? Int,
-                   fileSize > maxFileSize {
-                    // Show error for file too large
-                    showFileSizeError()
-                    isPresented = false
-                    return
+            if response == .OK {
+                var hasErrors = false
+                
+                // Process each selected file
+                for url in openPanel.urls {
+                    // Check file size
+                    if let attributes = try? FileManager.default.attributesOfItem(atPath: url.path),
+                       let fileSize = attributes[.size] as? Int,
+                       fileSize > maxFileSize {
+                        hasErrors = true
+                        continue // Skip this file
+                    }
+                    
+                    // Load image data
+                    if let imageData = try? Data(contentsOf: url) {
+                        // Validate it's a valid image
+                        if NSImage(data: imageData) != nil {
+                            selectedImages.append(imageData)
+                        } else {
+                            hasErrors = true
+                        }
+                    }
                 }
                 
-                // Load image data
-                if let imageData = try? Data(contentsOf: url) {
-                    // Validate it's a valid image
-                    if NSImage(data: imageData) != nil {
-                        selectedImageData = imageData
-                    } else {
-                        showInvalidImageError()
-                    }
+                // Show error if any files failed
+                if hasErrors {
+                    showMultipleFilesError()
                 }
             }
             isPresented = false
+            
+            // Restore pin state after panel is fully closed
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if !wasOriginallyPinned {
+                    SidebarWindowController.shared.setSidebarPinned(false)
+                }
+            }
         }
     }
     
@@ -84,13 +105,22 @@ struct ImagePickerView: NSViewRepresentable {
         alert.addButton(withTitle: "OK")
         alert.runModal()
     }
+    
+    private func showMultipleFilesError() {
+        let alert = NSAlert()
+        alert.messageText = "Some Files Could Not Be Added"
+        alert.informativeText = "One or more files were too large (over 20MB) or not valid images."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
 }
 
 // MARK: - Image Drop Delegate
 
 /// Handles drag and drop operations for images
 struct ImageDropDelegate: DropDelegate {
-    @Binding var droppedImageData: Data?
+    @Binding var droppedImages: [Data]
     @Binding var isDragTargeted: Bool
     let maxFileSize: Int = 20 * 1024 * 1024 // 20MB
     
@@ -116,7 +146,7 @@ struct ImageDropDelegate: DropDelegate {
                     if let data = data,
                        data.count <= maxFileSize,
                        NSImage(data: data) != nil {
-                        droppedImageData = data
+                        droppedImages.append(data)
                     }
                 }
             }
@@ -131,7 +161,7 @@ struct ImageDropDelegate: DropDelegate {
                    data.count <= maxFileSize,
                    NSImage(data: data) != nil {
                     DispatchQueue.main.async {
-                        droppedImageData = data
+                        droppedImages.append(data)
                     }
                 }
             }
