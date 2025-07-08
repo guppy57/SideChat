@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 import Defaults
 import UniformTypeIdentifiers
 
@@ -17,11 +18,12 @@ struct SidebarView: View {
     @State private var selectedImages: [Data] = []
     @State private var showImagePicker = false
     @State private var isDragTargeted = false
-    @State private var showChatList = false
     @State private var selectedChatId: UUID?
     @State private var currentChat: Chat?
     @State private var isRenamingChat = false
     @State private var renameChatTitle = ""
+    @StateObject private var chatListViewModel = ChatListViewModel()
+    private var chatListWindow: NSWindow?
     
     // MARK: - Initialization
     
@@ -168,6 +170,10 @@ struct SidebarView: View {
             isRenamingChat = false
         }
         .task {
+            // Load chats for the menu
+            await chatListViewModel.loadChats()
+            
+            // Set up initial chat
             do {
                 let chats = try await DatabaseManager.shared.loadAllChats()
                 if let firstChat = chats.first {
@@ -196,6 +202,15 @@ struct SidebarView: View {
         }
     }
     
+    private var recentChats: [Chat] {
+        // Get the most recent 20 chats, sorted by update date
+        return chatListViewModel.chats
+            .filter { !$0.isArchived }
+            .sorted { $0.updatedAt > $1.updatedAt }
+            .prefix(20)
+            .map { $0 }
+    }
+    
     private var inputToolbar: some View {
         VStack(spacing: 0) {
             if !selectedImages.isEmpty {
@@ -211,12 +226,57 @@ struct SidebarView: View {
                 .buttonStyle(PlainButtonStyle())
                 .help("New Chat")
                 
-                Button(action: showChatListPopover) {
+                Menu {
+                    // Recent chats section
+                    if !recentChats.isEmpty {
+                        Section("Recent Chats") {
+                            ForEach(recentChats) { chat in
+                                Button(action: { 
+                                    Task {
+                                        await switchToChat(chat.id)
+                                    }
+                                }) {
+                                    Label {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(chat.displayTitle)
+                                                .lineLimit(1)
+                                            if let preview = chat.lastMessagePreview {
+                                                Text(preview)
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                                    .lineLimit(1)
+                                            }
+                                        }
+                                    } icon: {
+                                        Image(systemName: providerIcon(for: chat.llmProvider))
+                                            .foregroundColor(providerColor(for: chat.llmProvider))
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Divider()
+                    }
+                    
+                    // Action to open full list with search
+                    Button(action: { openChatListWindow() }) {
+                        Label("Search All Chats...", systemImage: "magnifyingglass")
+                    }
+                    
+                    Divider()
+                    
+                    // New chat option
+                    Button(action: createNewChat) {
+                        Label("New Chat", systemImage: "plus.bubble")
+                    }
+                } label: {
                     Image(systemName: "list.bullet")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Color.primary.opacity(0.7))
                 }
-                .buttonStyle(PlainButtonStyle())
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
                 .help("Chat History")
                 
                 if enableImageUploads {
@@ -312,6 +372,9 @@ struct SidebarView: View {
                 currentChat = newChat
                 selectedChatId = newChat.id
                 chatViewModel.loadMessages(for: newChat.id)
+                
+                // Refresh the chat list for the menu
+                await chatListViewModel.loadChats()
             } catch {
                 print("Failed to create new chat: \(error)")
             }
@@ -319,8 +382,44 @@ struct SidebarView: View {
     }
     
     private func showChatListPopover() {
-        // TODO: Implement chat list as sheet or popover
-        print("Show chat list")
+        openChatListWindow()
+    }
+    
+    private func openChatListWindow() {
+        // Create a binding that will notify us when to close the window
+        let shouldCloseBinding = Binding<Bool>(
+            get: { false },
+            set: { _ in }
+        )
+        
+        let chatListView = NavigationStack {
+            ChatListView(
+                isPresented: shouldCloseBinding,
+                selectedChatId: $selectedChatId
+            )
+            .frame(minWidth: 400, minHeight: 500)
+        }
+        
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 600, height: 700),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        
+        window.title = "Chat History"
+        window.center()
+        window.contentView = NSHostingView(rootView: chatListView)
+        window.makeKeyAndOrderFront(nil)
+        
+        // Set minimum size
+        window.minSize = NSSize(width: 400, height: 500)
+        
+        // Make the window level normal so it can be properly activated
+        window.level = .normal
+        
+        // Ensure the window can become key
+        window.isReleasedWhenClosed = false
     }
     
     private func togglePin() {
