@@ -13,17 +13,23 @@ struct SidebarView: View {
     @Default(.colorTheme) private var colorTheme
     @Default(.enableImageUploads) private var enableImageUploads
     @State private var messageText = ""
-    @State private var currentChatId = UUID() // TODO: Load from database or create new
+    @StateObject private var chatViewModel: ChatViewModel
     @State private var selectedImages: [Data] = []
     @State private var showImagePicker = false
     @State private var isDragTargeted = false
+    
+    // MARK: - Initialization
+    
+    init(chatId: UUID? = nil) {
+        _chatViewModel = StateObject(wrappedValue: ChatViewModel(chatId: chatId))
+    }
     
     // MARK: - Body
     
     var body: some View {
         VStack(spacing: 0) {
             // Main content area with chat view
-            ChatView(chatId: currentChatId)
+            ChatView(viewModel: chatViewModel)
             
             // Combined input and toolbar area - iMessage style
             VStack(spacing: 0) {
@@ -107,7 +113,7 @@ struct SidebarView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .help("Send Message")
-                .disabled(messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && selectedImages.isEmpty)
+                .disabled(messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && selectedImages.isEmpty || chatViewModel.isTyping)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
@@ -202,18 +208,14 @@ struct SidebarView: View {
     }
     
     private func sendMessage() {
-        // TODO: Implement message sending to LLM
         let trimmedMessage = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmedMessage.isEmpty || !selectedImages.isEmpty {
-            print("Sending message: \(trimmedMessage)")
-            if !selectedImages.isEmpty {
-                print("With \(selectedImages.count) image(s)")
-                for (index, imageData) in selectedImages.enumerated() {
-                    print("  Image \(index + 1): \(imageData.count) bytes")
-                }
-            }
-            messageText = "" // Clear the input field
-            selectedImages.removeAll() // Clear all images
+            // Send message through view model
+            chatViewModel.sendMessage(content: trimmedMessage, images: selectedImages)
+            
+            // Clear the input
+            messageText = ""
+            selectedImages.removeAll()
         }
     }
     

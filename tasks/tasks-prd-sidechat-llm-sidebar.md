@@ -107,20 +107,21 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 4.3 Implement ChatBubbleView using custom Shape with Path-based tail drawing
   - [x] 4.4 Add proper message alignment (user right, LLM left)
   - [x] 4.5 Implement markdown rendering using MarkdownUI package
-  - [ ] 4.6 Add image upload and display functionality
+  - [x] 4.6 Add image upload and display functionality
+  - [x] 4.10 Create proper chat input field with multiline support - Already implemented in SidebarView
+  - [x] 4.18 Create ChatViewModel to manage chat state and operations - PRIORITY: Foundation for all chat features
+  - [x] 4.11 Add send button functionality and keyboard shortcuts - Connect to ChatViewModel
+  - [ ] 4.22 Create MockLLMService for testing streaming and responses
   - [ ] 4.7 Create typing indicator for LLM responses
   - [ ] 4.8 Implement message streaming using URLSession.shared.bytes
   - [ ] 4.9 Add message copy functionality for individual messages
-  - [ ] 4.10 Create proper chat input field with multiline support
-  - [ ] 4.11 Add send button functionality and keyboard shortcuts
+  - [ ] 4.17 Add loading states and error handling throughout UI
+  - [ ] 4.19 Create SidebarViewModel for overall sidebar state management
   - [ ] 4.12 Implement ChatListView with searchable chat history
   - [ ] 4.13 Add chat creation UI with LLM provider selection
   - [ ] 4.14 Implement chat renaming functionality
   - [ ] 4.15 Add chat deletion with confirmation dialog
   - [ ] 4.16 Create chat export functionality (markdown/JSON)
-  - [ ] 4.17 Add loading states and error handling throughout UI
-  - [ ] 4.18 Create ChatViewModel to manage chat state and operations
-  - [ ] 4.19 Create SidebarViewModel for overall sidebar state management
   - [ ] 4.20 Create BlurredContainer component for consistent translucent backgrounds
   - [ ] 4.21 Implement bottom-anchored chat list with reverse scroll behavior
 
@@ -179,11 +180,11 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
 
 ## Next Priority Tasks
 
-1. **Implement transparent window background (3.13)** - Remove visual effect from window
-2. **Create BlurredBackground ViewModifier (4.20)** - For individual UI elements
-3. **Refactor SidebarView for bottom-up layout (4.1)** - Remove header, reorganize layout
-4. **Create FloatingToolbar component (3.15)** - Consolidate controls above input
-5. **Implement bottom-up chat list (3.16, 4.21)** - Reverse scroll behavior
+1. **Create ChatViewModel (4.18)** - Foundation for managing chat state and message flow
+2. **Connect send button functionality (4.11)** - Wire up existing UI to ChatViewModel
+3. **Create MockLLMService (4.22)** - Test service for simulating LLM responses
+4. **Implement typing indicator (4.7)** - Visual feedback during LLM responses
+5. **Add message streaming (4.8)** - Real-time updates as LLM generates responses
 
 ## Notes on Current Implementation
 
@@ -192,3 +193,5 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
 - Database infrastructure is complete with encryption and performance optimization
 - All foundational packages are integrated (Defaults, LaunchAtLogin, KeyboardShortcuts)
 - The app launches successfully with a working sidebar that slides in/out
+- UI components are in place but not connected to data flow (messages are hardcoded in ChatView)
+- Need to create ViewModels/ and Services/ directories for the next phase
