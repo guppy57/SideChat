@@ -1,5 +1,24 @@
 {
   "source": "/Users/guppy57/GitHub/SideChat/SideChat/Views/ChatBubbleView.swift",
-  "tables": {},
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Copy",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "Copy as Markdown",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 108
+        }
+      }
+    ]
+  },
   "version": 1
 }

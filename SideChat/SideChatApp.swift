@@ -27,19 +27,11 @@ struct SideChatApp: App {
         // Configure any synchronous app settings here
         // All async initialization is handled by AppDelegate
         
-        // Configure SQLite's date formatter to use a consistent format
-        configureSQLiteDateFormatter()
+        // SQLite date formatter configuration is now handled in DatabaseManager
         
         #if DEBUG
         print("🚀 SideChat starting up...")
         #endif
-    }
-    
-    private func configureSQLiteDateFormatter() {
-        // Set up the global date formatter for SQLite.swift
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
     }
     
     var body: some Scene {

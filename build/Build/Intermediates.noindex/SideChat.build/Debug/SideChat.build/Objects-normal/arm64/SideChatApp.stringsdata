@@ -7,7 +7,7 @@
         "key": "Debug Settings",
         "location": {
           "startingColumn": 26,
-          "startingLine": 96
+          "startingLine": 88
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "Launch at Login",
         "location": {
           "startingColumn": 21,
-          "startingLine": 68
+          "startingLine": 60
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "Debug Info",
         "location": {
           "startingColumn": 21,
-          "startingLine": 72
+          "startingLine": 64
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "Actions",
         "location": {
           "startingColumn": 21,
-          "startingLine": 81
+          "startingLine": 73
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "First Launch",
         "location": {
           "startingColumn": 32,
-          "startingLine": 73
+          "startingLine": 65
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "Onboarding Complete",
         "location": {
           "startingColumn": 32,
-          "startingLine": 74
+          "startingLine": 66
         }
       },
       {
@@ -55,7 +55,7 @@
         "key": "Last Version",
         "location": {
           "startingColumn": 32,
-          "startingLine": 75
+          "startingLine": 67
         }
       },
       {
@@ -63,7 +63,7 @@
         "key": "Debug Mode",
         "location": {
           "startingColumn": 32,
-          "startingLine": 76
+          "startingLine": 68
         }
       },
       {
@@ -71,7 +71,7 @@
         "key": "Schema Version",
         "location": {
           "startingColumn": 32,
-          "startingLine": 77
+          "startingLine": 69
         }
       },
       {
@@ -79,7 +79,7 @@
         "key": "Needs Migration",
         "location": {
           "startingColumn": 32,
-          "startingLine": 78
+          "startingLine": 70
         }
       },
       {
@@ -87,7 +87,7 @@
         "key": "Reset All Settings",
         "location": {
           "startingColumn": 24,
-          "startingLine": 82
+          "startingLine": 74
         }
       },
       {
@@ -95,7 +95,7 @@
         "key": "Force Migration",
         "location": {
           "startingColumn": 24,
-          "startingLine": 87
+          "startingLine": 79
         }
       }
     ]

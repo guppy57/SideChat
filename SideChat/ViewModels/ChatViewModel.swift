@@ -26,7 +26,7 @@ class ChatViewModel: ObservableObject {
     
     // MARK: - Properties
     
-    let chatId: UUID
+    private(set) var chatId: UUID
     private let databaseManager: DatabaseManager
     private var llmService: LLMServiceProtocol?
     private var streamingTask: Task<Void, Never>?
@@ -64,10 +64,35 @@ class ChatViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        // TODO: Load from database
-        // For now, use mock data if no messages exist
-        if messages.isEmpty {
-            loadMockMessages()
+        do {
+            messages = try await databaseManager.loadMessages(for: chatId)
+            
+            
+            // If no messages exist, don't load mock data
+            // Let the user start fresh
+        } catch {
+            print("Failed to load messages: \(error)")
+            self.error = error
+        }
+    }
+    
+    /// Load messages for a specific chat
+    func loadMessages(for chatId: UUID) {
+        // Cancel any existing streaming
+        streamingTask?.cancel()
+        
+        // Update chat ID
+        self.chatId = chatId
+        
+        // Clear current messages
+        messages = []
+        currentStreamingMessage = nil
+        isTyping = false
+        error = nil
+        
+        // Load new messages
+        Task {
+            await loadMessages()
         }
     }
     
@@ -100,6 +125,22 @@ class ChatViewModel: ObservableObject {
         // Save to database (async)
         Task {
             do {
+                // If this is the first message, create and save the chat
+                if messages.count == 1 {
+                    var newChat = Chat(
+                        id: chatId,  // Use existing chat ID
+                        title: generateChatTitle(from: trimmedContent),
+                        createdAt: Date(),
+                        updatedAt: Date(),
+                        llmProvider: defaultProvider,
+                        modelName: getDefaultModel(),
+                        isArchived: false,
+                        messageCount: 1,
+                        lastMessagePreview: trimmedContent
+                    )
+                    try await databaseManager.saveChat(newChat)
+                }
+                
                 try await databaseManager.saveMessage(userMessage)
             } catch {
                 print("Failed to save user message: \(error)")
@@ -196,11 +237,16 @@ class ChatViewModel: ObservableObject {
             status: .streaming
         )
         
-        // Add to messages
-        withAnimation(.easeInOut(duration: 0.2)) {
-            messages.append(botMessage)
-            currentStreamingMessage = botMessage
-            isTyping = false  // Hide typing indicator when streaming starts
+        // Don't add the message yet - keep typing indicator showing
+        currentStreamingMessage = botMessage
+        
+        // Save bot message immediately with streaming status
+        Task {
+            do {
+                try await databaseManager.saveMessage(botMessage)
+            } catch {
+                print("Failed to save initial bot message: \(error)")
+            }
         }
         
         do {
@@ -212,28 +258,72 @@ class ChatViewModel: ObservableObject {
             let stream = try await service.sendMessage(
                 content: userMessage.content,
                 images: userMessage.imageData != nil ? [userMessage.imageData!] : [],
-                chatHistory: messages.dropLast() // Exclude the bot message we just added
+                chatHistory: messages // Bot message not added yet
             )
             
             // Process stream
+            var isFirstChunk = true
             for try await chunk in stream {
                 botMessage.appendContent(chunk)
+                
+                // Add message to array on first chunk
+                if isFirstChunk {
+                    isFirstChunk = false
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        messages.append(botMessage)
+                        isTyping = false  // Hide typing indicator when content starts
+                    }
+                }
+                
                 updateStreamingMessage(botMessage)
             }
+            // Check if task was cancelled
+            if Task.isCancelled {
+                return
+            }
             
-            // Mark as complete
-            botMessage.setStatus(MessageStatus.sent)
+            // If no content was received, still add the message
+            if messages.firstIndex(where: { $0.id == botMessage.id }) == nil {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    messages.append(botMessage)
+                    isTyping = false
+                }
+            }
+            
+            // Mark as complete - get the latest version from array
+            if let index = messages.firstIndex(where: { $0.id == botMessage.id }) {
+                messages[index].setStatus(.sent)
+                botMessage = messages[index]
+            }
             finalizeMessage(botMessage)
             
         } catch {
             // Handle error
             self.error = error
-            botMessage.markAsFailed(error: MessageError(
-                code: "llm_error",
-                message: error.localizedDescription
-            ))
+            
+            // If message wasn't added yet, add it now
+            if messages.firstIndex(where: { $0.id == botMessage.id }) == nil {
+                botMessage.markAsFailed(error: MessageError(
+                    code: "llm_error",
+                    message: error.localizedDescription
+                ))
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    messages.append(botMessage)
+                    isTyping = false
+                }
+            } else {
+                // Update message in array
+                if let index = messages.firstIndex(where: { $0.id == botMessage.id }) {
+                    messages[index].markAsFailed(error: MessageError(
+                        code: "llm_error",
+                        message: error.localizedDescription
+                    ))
+                    botMessage = messages[index]
+                }
+            }
             finalizeMessage(botMessage)
         }
+        
     }
     
     
@@ -274,12 +364,12 @@ class ChatViewModel: ObservableObject {
             throttledScrollUpdate = Date()
         }
         
-        // Save to database
+        // Save to database - use updateMessage since the initial message was already saved
         Task {
             do {
-                try await databaseManager.saveMessage(message)
+                try await databaseManager.updateMessage(message)
             } catch {
-                print("Failed to save bot message: \(error)")
+                print("Failed to update bot message: \(error)")
             }
         }
     }
@@ -343,5 +433,21 @@ class ChatViewModel: ObservableObject {
     /// Get messages for export
     func exportMessages() -> [Message] {
         messages
+    }
+    
+    // MARK: - Private Helper Methods
+    
+    /// Generate a chat title from the first message
+    private func generateChatTitle(from content: String) -> String {
+        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // If content is short enough, use it as is
+        if trimmed.count <= 30 {
+            return trimmed
+        }
+        
+        // Otherwise, truncate and add ellipsis
+        let truncated = String(trimmed.prefix(27))
+        return "\(truncated)..."
     }
 }

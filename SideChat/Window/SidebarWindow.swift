@@ -385,6 +385,7 @@ class SidebarWindow: NSWindow {
         false
     }
     
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         setupWindow()

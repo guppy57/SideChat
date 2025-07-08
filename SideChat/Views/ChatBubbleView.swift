@@ -65,7 +65,7 @@ struct ChatBubbleView: View {
                     .background(
                         BubbleBackground(isUser: message.isUser, colorTheme: colorTheme)
                     )
-                    .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
                     .overlay(
                         BubbleShape(isFromUser: message.isUser)
                             .stroke(bubbleBorder, lineWidth: 0.5)

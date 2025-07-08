@@ -9,7 +9,7 @@ import SQLite
 struct DatabaseSchema {
     
     // MARK: - Schema Version
-    static let currentVersion = 1
+    static let currentVersion = 2
     
     // MARK: - Table Definitions
     
@@ -100,14 +100,11 @@ struct DatabaseSchema {
         try createSettingsTable(db: db)
         try createChatStatsTable(db: db)
         
-        // Create full-text search tables
-        try createFullTextSearchTables(db: db)
-        
         // Create indexes
         try createIndexes(db: db)
         
-        // Create triggers for maintaining data integrity
-        try createTriggers(db: db)
+        // FTS is now handled by FTSManager - no longer created here
+        // Triggers removed to prevent database corruption issues
     }
     
     private static func createChatsTable(db: Connection) throws {
@@ -188,25 +185,25 @@ struct DatabaseSchema {
     }
     
     private static func createIndexes(db: Connection) throws {
-        // Chat indexes
-        try db.run(Tables.chats.createIndex(Tables.chatUpdatedAt, ifNotExists: true))
-        try db.run(Tables.chats.createIndex(Tables.chatIsArchived, ifNotExists: true))
-        try db.run(Tables.chats.createIndex(Tables.chatLLMProvider, ifNotExists: true))
-        try db.run(Tables.chats.createIndex(Tables.chatTitle, ifNotExists: true))
+        // Chat indexes with explicit names
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.chatUpdatedAtIndex) ON chats(updated_at)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.chatIsArchivedIndex) ON chats(is_archived)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.chatProviderIndex) ON chats(llm_provider)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.chatTitleIndex) ON chats(title)")
         
-        // Message indexes
-        try db.run(Tables.messages.createIndex(Tables.messageChatId, ifNotExists: true))
-        try db.run(Tables.messages.createIndex(Tables.messageTimestamp, ifNotExists: true))
-        try db.run(Tables.messages.createIndex(Tables.messageIsUser, ifNotExists: true))
-        try db.run(Tables.messages.createIndex(Tables.messageStatus, ifNotExists: true))
-        try db.run(Tables.messages.createIndex(Tables.messageProvider, ifNotExists: true))
+        // Message indexes with explicit names
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.messageChatIdIndex) ON messages(chat_id)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.messageTimestampIndex) ON messages(timestamp)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.messageIsUserIndex) ON messages(is_user)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.messageStatusIndex) ON messages(status)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.messageProviderIndex) ON messages(provider)")
         
-        // Statistics indexes
-        try db.run(Tables.chatStats.createIndex(Tables.statDate, ifNotExists: true))
-        try db.run(Tables.chatStats.createIndex(Tables.statChatId, ifNotExists: true))
+        // Statistics indexes with explicit names
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.chatStatsDateIndex) ON chat_stats(date)")
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.chatStatsChatIndex) ON chat_stats(chat_id)")
         
-        // Settings index
-        try db.run(Tables.settings.createIndex(Tables.settingKey, ifNotExists: true))
+        // Settings index with explicit name
+        try db.execute("CREATE INDEX IF NOT EXISTS \(Indexes.settingsKeyIndex) ON settings(key)")
         
         // Create composite indexes using raw SQL for better control
         try createCompositeIndexes(db: db)

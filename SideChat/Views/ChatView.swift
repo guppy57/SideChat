@@ -19,6 +19,10 @@ struct ChatView: View {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                 VStack(spacing: 0) {
+                    // Top buffer to allow scrolling content below gradient
+                    Color.clear
+                        .frame(height: 30)
+                    
                     // Spacer to push content to bottom
                     Spacer(minLength: 0)
                     
@@ -112,11 +116,16 @@ struct ChatView: View {
                 .allowsHitTesting(true)
         )
         .mask(
-            // Gradient mask for fade effect at bottom
+            // Gradient mask for fade effect at top and bottom
             LinearGradient(
                 gradient: Gradient(stops: [
-                    .init(color: .black, location: 0.0),
+                    // Top fade
+                    .init(color: .clear, location: 0.0),
+                    .init(color: .black.opacity(0.6), location: 0.01),
+                    .init(color: .black, location: 0.03),
+                    // Middle solid
                     .init(color: .black, location: 0.97),
+                    // Bottom fade
                     .init(color: .black.opacity(0.6), location: 0.99),
                     .init(color: .clear, location: 1.0)
                 ]),

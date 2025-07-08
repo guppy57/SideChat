@@ -17,11 +17,18 @@ struct SidebarView: View {
     @State private var selectedImages: [Data] = []
     @State private var showImagePicker = false
     @State private var isDragTargeted = false
+    @State private var showChatList = false
+    @State private var selectedChatId: UUID?
+    @State private var currentChat: Chat?
+    @State private var isRenamingChat = false
+    @State private var renameChatTitle = ""
     
     // MARK: - Initialization
     
     init(chatId: UUID? = nil) {
-        _chatViewModel = StateObject(wrappedValue: ChatViewModel(chatId: chatId))
+        let initialChatId = chatId ?? UUID()
+        _chatViewModel = StateObject(wrappedValue: ChatViewModel(chatId: initialChatId))
+        _selectedChatId = State(initialValue: chatId)
     }
     
     // MARK: - Body
@@ -31,19 +38,171 @@ struct SidebarView: View {
             // Main content area with chat view
             ChatView(viewModel: chatViewModel)
             
-            // Combined input and toolbar area - iMessage style
-            VStack(spacing: 0) {
-                // Inline image preview if present
-                if !selectedImages.isEmpty {
-                    InlineImagesPreview(images: $selectedImages)
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .top).combined(with: .opacity),
-                            removal: .scale(scale: 0.8).combined(with: .opacity)
-                        ))
-                }
-                
+            // Combined input and toolbar area
+            inputToolbar
+            
+            // Chat header below the input toolbar
+            if let chat = currentChat {
                 HStack(spacing: 8) {
-                // Left toolbar buttons
+                    // Chat icon
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(accentColor)
+                    
+                    // Chat title
+                    if isRenamingChat {
+                        TextField("Chat Title", text: $renameChatTitle)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .font(.system(size: 13, weight: .medium))
+                            .onSubmit {
+                                Task {
+                                    await renameCurrentChat(renameChatTitle)
+                                    isRenamingChat = false
+                                }
+                            }
+                            .onAppear {
+                                renameChatTitle = chat.title
+                            }
+                    } else {
+                        Text(chat.displayTitle)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
+                            .contextMenu {
+                                Button(action: {
+                                    renameChatTitle = chat.title
+                                    isRenamingChat = true
+                                }) {
+                                    Label("Rename Chat", systemImage: "pencil")
+                                }
+                            }
+                    }
+                    
+                    Spacer()
+                    
+                    // Provider badge
+                    HStack(spacing: 4) {
+                        Image(systemName: providerIcon(for: chat.llmProvider))
+                            .font(.system(size: 11))
+                        Text(chat.llmProvider.displayName)
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .foregroundColor(providerColor(for: chat.llmProvider))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(providerColor(for: chat.llmProvider).opacity(0.15))
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(providerColor(for: chat.llmProvider).opacity(0.3), lineWidth: 0.5)
+                    )
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(NSColor.controlBackgroundColor).opacity(0.8))
+                        
+                        BlurredBackgroundView(
+                            material: .sidebar,
+                            opacity: 1.0
+                        )
+                        .cornerRadius(16)
+                    }
+                    .shadow(
+                        color: Color.black.opacity(0.15),
+                        radius: 8,
+                        x: 0,
+                        y: 2
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            Color.black.opacity(0.001)
+                .contentShape(Rectangle())
+                .allowsHitTesting(true)
+        )
+        .onDrop(of: [.image, .fileURL], isTargeted: $isDragTargeted, perform: handleDrop)
+        .overlay(
+            isDragTargeted && enableImageUploads ? ZStack {
+                Color.black.opacity(0.7)
+                VStack(spacing: 8) {
+                    Image(systemName: "photo.badge.plus")
+                        .font(.system(size: 60))
+                    Text("Drop image here")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+            }
+            .allowsHitTesting(false) : nil
+        )
+        .background {
+            ImagePickerView(selectedImages: $selectedImages, isPresented: $showImagePicker)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .paste)) { _ in
+            handlePaste()
+        }
+        .onChange(of: selectedChatId) { _, newChatId in
+            if let chatId = newChatId {
+                Task {
+                    await switchToChat(chatId)
+                }
+            }
+        }
+        .onChange(of: currentChat) { _, _ in
+            isRenamingChat = false
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
+            isRenamingChat = false
+        }
+        .task {
+            do {
+                let chats = try await DatabaseManager.shared.loadAllChats()
+                if let firstChat = chats.first {
+                    selectedChatId = firstChat.id
+                    currentChat = firstChat
+                    chatViewModel.loadMessages(for: firstChat.id)
+                } else {
+                    await createInitialChat()
+                }
+            } catch {
+                print("Failed to load initial chats: \(error)")
+                await createInitialChat()
+            }
+        }
+    }
+    
+    // MARK: - Computed Properties
+    
+    private var accentColor: Color {
+        switch colorTheme {
+        case .blue: return .blue
+        case .green: return .green
+        case .purple: return .purple
+        case .orange: return .orange
+        case .gray: return .gray
+        }
+    }
+    
+    private var inputToolbar: some View {
+        VStack(spacing: 0) {
+            if !selectedImages.isEmpty {
+                InlineImagesPreview(images: $selectedImages)
+            }
+            
+            HStack(spacing: 8) {
                 Button(action: createNewChat) {
                     Image(systemName: "plus.bubble")
                         .font(.system(size: 16, weight: .medium))
@@ -52,7 +211,7 @@ struct SidebarView: View {
                 .buttonStyle(PlainButtonStyle())
                 .help("New Chat")
                 
-                Button(action: showChatList) {
+                Button(action: showChatListPopover) {
                     Image(systemName: "list.bullet")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Color.primary.opacity(0.7))
@@ -60,7 +219,6 @@ struct SidebarView: View {
                 .buttonStyle(PlainButtonStyle())
                 .help("Chat History")
                 
-                // Image upload button
                 if enableImageUploads {
                     Button(action: { showImagePicker = true }) {
                         Image(systemName: "photo")
@@ -75,7 +233,6 @@ struct SidebarView: View {
                     .frame(height: 20)
                     .padding(.horizontal, 4)
                 
-                // Text input field - multi-line with auto-grow
                 TextField("Type a message...", text: $messageText, axis: .vertical)
                     .textFieldStyle(PlainTextFieldStyle())
                     .font(.body)
@@ -84,7 +241,6 @@ struct SidebarView: View {
                         sendMessage()
                     }
                 
-                // Right toolbar buttons
                 Button(action: togglePin) {
                     Image(systemName: SidebarWindowController.shared.isSidebarPinned ? "pin.fill" : "pin")
                         .font(.system(size: 16, weight: .medium))
@@ -105,7 +261,6 @@ struct SidebarView: View {
                     .frame(height: 20)
                     .padding(.horizontal, 4)
                 
-                // Send button
                 Button(action: sendMessage) {
                     Image(systemName: "paperplane.fill")
                         .foregroundColor(accentColor)
@@ -114,92 +269,57 @@ struct SidebarView: View {
                 .buttonStyle(PlainButtonStyle())
                 .help("Send Message")
                 .disabled(messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && selectedImages.isEmpty || chatViewModel.isTyping)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
             }
-            .background(
-                ZStack {
-                    // Solid background for better contrast
-                    RoundedRectangle(cornerRadius: 20) // More rounded like iMessage
-                        .fill(Color(NSColor.controlBackgroundColor).opacity(0.8))
-                    
-                    // Blur on top
-                    BlurredBackgroundView(
-                        material: .sidebar,
-                        opacity: 1.0
-                    )
-                    .cornerRadius(20)
-                }
-                .shadow(
-                    color: Color.black.opacity(0.25),
-                    radius: 10,
-                    x: 0,
-                    y: 3
-                )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
-            )
-            .padding(16)
-            .animation(.easeInOut(duration: 0.2), value: messageText)
-            .animation(.easeInOut(duration: 0.2), value: selectedImages)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            // Nearly invisible background that captures mouse events
-            Color.black.opacity(0.001)
-                .contentShape(Rectangle())
-                .allowsHitTesting(true)
-        )
-        .onDrop(of: [.image, .fileURL], isTargeted: $isDragTargeted, perform: handleDrop)
-        .overlay {
-            if isDragTargeted && enableImageUploads {
-                ZStack {
-                    Color.black.opacity(0.7)
-                    VStack(spacing: 8) {
-                        Image(systemName: "photo.badge.plus")
-                            .font(.system(size: 60))
-                        Text("Drop image here")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(.white)
-                }
-                .allowsHitTesting(false)
-                .animation(.easeInOut(duration: 0.2), value: isDragTargeted)
+            ZStack {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(NSColor.controlBackgroundColor).opacity(0.8))
+                
+                BlurredBackgroundView(
+                    material: .sidebar,
+                    opacity: 1.0
+                )
+                .cornerRadius(20)
             }
-        }
-        .background {
-            ImagePickerView(selectedImages: $selectedImages, isPresented: $showImagePicker)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .paste)) { _ in
-            handlePaste()
-        }
-    }
-    
-    // MARK: - Computed Properties
-    
-    private var accentColor: Color {
-        switch colorTheme {
-        case .blue: return .blue
-        case .green: return .green
-        case .purple: return .purple
-        case .orange: return .orange
-        case .gray: return .gray
-        }
+            .shadow(
+                color: Color.black.opacity(0.25),
+                radius: 10,
+                x: 0,
+                y: 3
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+        )
+        .padding(16)
     }
     
     // MARK: - Actions
     
     private func createNewChat() {
-        // TODO: Implement new chat creation
-        print("Create new chat")
+        Task {
+            let newChat = Chat.createNew(
+                title: "New Chat",
+                llmProvider: Defaults[.defaultLLMProvider]
+            )
+            
+            do {
+                try await DatabaseManager.shared.saveChat(newChat)
+                currentChat = newChat
+                selectedChatId = newChat.id
+                chatViewModel.loadMessages(for: newChat.id)
+            } catch {
+                print("Failed to create new chat: \(error)")
+            }
+        }
     }
     
-    private func showChatList() {
-        // TODO: Implement chat list display
+    private func showChatListPopover() {
+        // TODO: Implement chat list as sheet or popover
         print("Show chat list")
     }
     
@@ -215,10 +335,7 @@ struct SidebarView: View {
     private func sendMessage() {
         let trimmedMessage = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmedMessage.isEmpty || !selectedImages.isEmpty {
-            // Send message through view model
             chatViewModel.sendMessage(content: trimmedMessage, images: selectedImages)
-            
-            // Clear the input
             messageText = ""
             selectedImages.removeAll()
         }
@@ -227,13 +344,12 @@ struct SidebarView: View {
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         guard enableImageUploads else { return false }
         
-        // Handle image drop
         for provider in providers {
             if provider.hasItemConformingToTypeIdentifier("public.image") {
                 provider.loadDataRepresentation(forTypeIdentifier: "public.image") { data, error in
                     DispatchQueue.main.async {
                         if let data = data,
-                           data.count <= 20 * 1024 * 1024, // 20MB limit
+                           data.count <= 20 * 1024 * 1024,
                            NSImage(data: data) != nil {
                             selectedImages.append(data)
                         }
@@ -252,6 +368,96 @@ struct SidebarView: View {
         
         if let imageData = ClipboardImageHandler.getImageFromClipboard() {
             selectedImages.append(imageData)
+        }
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func providerIcon(for provider: LLMProvider) -> String {
+        switch provider {
+        case .openai:
+            return "brain"
+        case .anthropic:
+            return "ant.circle"
+        case .google:
+            return "sparkle"
+        case .local:
+            return "desktopcomputer"
+        }
+    }
+    
+    private func providerColor(for provider: LLMProvider) -> Color {
+        switch provider {
+        case .openai:
+            return .green
+        case .anthropic:
+            return .orange
+        case .google:
+            return .blue
+        case .local:
+            return .purple
+        }
+    }
+    
+    // MARK: - Chat Management
+    
+    private func switchToChat(_ chatId: UUID) async {
+        do {
+            if let chat = try await DatabaseManager.shared.loadChat(id: chatId) {
+                currentChat = chat
+                chatViewModel.loadMessages(for: chatId)
+                selectedChatId = chatId
+            }
+        } catch {
+            print("Failed to switch chat: \(error)")
+        }
+    }
+    
+    private func renameCurrentChat(_ newTitle: String) async {
+        guard var chat = currentChat else { return }
+        
+        chat.updateTitle(newTitle)
+        
+        do {
+            try await DatabaseManager.shared.saveChat(chat)
+            currentChat = chat
+        } catch {
+            print("Failed to rename chat: \(error)")
+        }
+    }
+    
+    private func createInitialChat() async {
+        let chatToSave = Chat(
+            id: chatViewModel.chatId,
+            title: "New Chat",
+            createdAt: Date(),
+            updatedAt: Date(),
+            llmProvider: Defaults[.defaultLLMProvider],
+            modelName: getDefaultModelName(for: Defaults[.defaultLLMProvider]),
+            isArchived: false,
+            messageCount: 0,
+            lastMessagePreview: nil
+        )
+        
+        do {
+            try await DatabaseManager.shared.saveChat(chatToSave)
+            currentChat = chatToSave
+            selectedChatId = chatToSave.id
+        } catch {
+            print("Failed to create initial chat: \(error)")
+        }
+    }
+    
+    private func getDefaultModelName(for provider: LLMProvider) -> String {
+        switch provider {
+        case .openai:
+            return Defaults[.openaiModel]
+        case .anthropic:
+            return Defaults[.anthropicModel]
+        case .google:
+            return Defaults[.googleModel]
+        case .local:
+            return Defaults[.localModelPath].isEmpty ? "local-model" : Defaults[.localModelPath]
         }
     }
 }

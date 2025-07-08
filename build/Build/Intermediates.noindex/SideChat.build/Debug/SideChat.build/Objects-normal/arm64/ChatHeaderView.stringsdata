@@ -1,0 +1,40 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Views/ChatHeaderView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Show Chat List",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rename Chat",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "(%lld)",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chat Title",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 92
+        }
+      }
+    ]
+  },
+  "version": 1
+}

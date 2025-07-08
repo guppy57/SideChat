@@ -306,6 +306,16 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 #if defined(__OBJC__)
 
+@class NSEvent;
+@class NSCoder;
+/// Custom NSView that accepts first mouse events for non-activating panels
+SWIFT_CLASS("_TtC8SideChat21AcceptsFirstMouseView")
+@interface AcceptsFirstMouseView : NSView
+- (BOOL)acceptsFirstMouse:(NSEvent * _Nullable)event SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)initWithFrame:(NSRect)frameRect OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
 @class NSNotification;
 @class NSApplication;
 /// AppDelegate manages the application lifecycle and handles graceful shutdown
@@ -335,7 +345,6 @@ SWIFT_CLASS("_TtC8SideChat13SidebarWindow")
 - (void)awakeFromNib;
 @end
 
-@class NSCoder;
 /// Manages the sidebar window lifecycle and coordinates with the app’s state
 SWIFT_CLASS("_TtC8SideChat23SidebarWindowController")
 @interface SidebarWindowController : NSWindowController

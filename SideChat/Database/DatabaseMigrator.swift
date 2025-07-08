@@ -17,9 +17,13 @@ class DatabaseMigrator: ObservableObject {
     
     private let migrations: [Migration] = [
         // Version 1 is the initial schema - no migration needed
-        // Future migrations would be added here like:
-        // Migration(fromVersion: 1, toVersion: 2, migrationBlock: migrateV1ToV2),
-        // Migration(fromVersion: 2, toVersion: 3, migrationBlock: migrateV2ToV3),
+        // Version 2: Remove old FTS triggers and tables
+        Migration(
+            fromVersion: 1, 
+            toVersion: 2, 
+            description: "Remove FTS triggers to prevent corruption",
+            migrationBlock: migrateV1ToV2
+        ),
     ]
     
     private init() {
@@ -321,68 +325,42 @@ struct SchemaValidationResult {
     let issues: [String]
 }
 
-// MARK: - Example Migrations
-
-// These are examples of how to define migrations for future schema changes
+// MARK: - Migrations
 
 extension DatabaseMigrator {
     
-    // Example: Migration from v1 to v2
+    // Migration from v1 to v2: Remove FTS triggers that cause corruption
     private static func migrateV1ToV2(db: Connection) throws {
-        // Add new column to chats table
-        try db.execute("""
-            ALTER TABLE chats 
-            ADD COLUMN tags TEXT
-        """)
+        print("Migrating from v1 to v2: Removing FTS triggers...")
         
-        // Create new tags table
-        try db.execute("""
-            CREATE TABLE IF NOT EXISTS tags (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                color TEXT,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
+        // Drop all FTS-related triggers
+        let triggers = [
+            "update_chat_stats_insert",
+            "update_chat_stats_delete",
+            "update_chats_fts_insert",
+            "update_chats_fts_update",
+            "update_chats_fts_delete"
+        ]
         
-        // Create junction table for many-to-many relationship
-        try db.execute("""
-            CREATE TABLE IF NOT EXISTS chat_tags (
-                chat_id TEXT NOT NULL,
-                tag_id TEXT NOT NULL,
-                PRIMARY KEY (chat_id, tag_id),
-                FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE,
-                FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
-            )
-        """)
+        for trigger in triggers {
+            do {
+                try db.execute("DROP TRIGGER IF EXISTS \(trigger)")
+                print("Dropped trigger: \(trigger)")
+            } catch {
+                print("Failed to drop trigger \(trigger): \(error)")
+            }
+        }
         
-        // Add indexes
-        try db.execute("CREATE INDEX idx_tags_name ON tags(name)")
-        try db.execute("CREATE INDEX idx_chat_tags_chat_id ON chat_tags(chat_id)")
-        try db.execute("CREATE INDEX idx_chat_tags_tag_id ON chat_tags(tag_id)")
-    }
-    
-    // Example: Migration from v2 to v3
-    private static func migrateV2ToV3(db: Connection) throws {
-        // Add support for message reactions
-        try db.execute("""
-            CREATE TABLE IF NOT EXISTS message_reactions (
-                id TEXT PRIMARY KEY,
-                message_id TEXT NOT NULL,
-                emoji TEXT NOT NULL,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
-            )
-        """)
+        // Drop old FTS tables (they will be recreated by FTSManager)
+        do {
+            try db.execute("DROP TABLE IF EXISTS chats_fts")
+            try db.execute("DROP TABLE IF EXISTS messages_fts")
+            print("Dropped old FTS tables")
+        } catch {
+            print("Failed to drop FTS tables: \(error)")
+        }
         
-        // Add index
-        try db.execute("CREATE INDEX idx_message_reactions_message_id ON message_reactions(message_id)")
-        
-        // Update messages table to include reaction count
-        try db.execute("""
-            ALTER TABLE messages 
-            ADD COLUMN reaction_count INTEGER DEFAULT 0
-        """)
+        print("Migration v1 to v2 completed")
     }
 }
 

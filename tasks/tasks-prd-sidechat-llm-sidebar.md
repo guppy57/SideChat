@@ -119,6 +119,8 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [ ] 4.13 Add chat creation UI with LLM provider selection
   - [ ] 4.14 Implement chat renaming functionality
   - [ ] 4.15 Add chat deletion with confirmation dialog
+  - [ ] 4.22 Add chat archiving with confirmation dialog
+  - [ ] 4.23 Add dropdown selectors in Chat History popover to select between active and archived chats
   - [ ] 4.16 Create chat export functionality (markdown/JSON)
   - [x] 4.20 Create BlurredContainer component for consistent translucent backgrounds
   - [x] 4.21 Implement bottom-anchored chat list with reverse scroll behavior
@@ -141,7 +143,6 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [ ] 5.14 Add network connectivity checks
   - [ ] 5.15 Implement conversation context management
   - [ ] 5.16 Add token counting and usage tracking
-  - [ ] 5.17 Add a copy to clipboard button underneath the chats for LLMs and for the chats the user sends
   - [ ] 5.18 Add a retry button to retry the LLM-api request for LLM produced chats
 
 - [ ] 6.0 Create settings and customization features

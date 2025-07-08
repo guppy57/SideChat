@@ -13,6 +13,8 @@ class DatabaseManager: ObservableObject {
     
     private var db: Connection?
     private let databasePath: String
+    private var isInitialized = false
+    private var ftsManager: FTSManager?
     
     // MARK: - Test Support
     
@@ -83,6 +85,11 @@ class DatabaseManager: ObservableObject {
     /// Initializes the database connection and performs migrations
     /// Must be called explicitly during app startup
     func initialize() async {
+        guard !isInitialized else {
+            print("Database already initialized, skipping duplicate initialization")
+            return
+        }
+        isInitialized = true
         await initializeDatabase()
     }
     
@@ -90,6 +97,18 @@ class DatabaseManager: ObservableObject {
     
     private func initializeDatabase() async {
         do {
+            // Check if database exists and try to validate it
+            if FileManager.default.fileExists(atPath: databasePath) {
+                let isValid = await validateDatabaseFile()
+                if !isValid {
+                    print("Database appears corrupted, removing and starting fresh...")
+                    try? FileManager.default.removeItem(atPath: databasePath)
+                    // Also remove WAL and SHM files if they exist
+                    try? FileManager.default.removeItem(atPath: databasePath + "-wal")
+                    try? FileManager.default.removeItem(atPath: databasePath + "-shm")
+                }
+            }
+            
             // Check if encryption is enabled in settings
             let encryptionEnabled = Defaults[.enableDataEncryption]
             
@@ -110,6 +129,25 @@ class DatabaseManager: ObservableObject {
             // Set cache size for better performance
             try db?.execute("PRAGMA cache_size = -64000") // 64MB cache
             
+            // Check database integrity
+            if let integrityResult = try db?.scalar("PRAGMA integrity_check") as? String {
+                if integrityResult != "ok" {
+                    print("Database integrity check failed: \(integrityResult)")
+                    // Database is corrupted, recover
+                    await recoverFromDatabaseError()
+                    return
+                }
+            }
+            
+            // Check if this is a fresh database and create tables if needed
+            if let db = db {
+                let tablesExist = try await checkTableExists(db: db, tableName: "chats")
+                if !tablesExist {
+                    print("Creating database tables for the first time...")
+                    try DatabaseSchema.createTables(db: db)
+                }
+            }
+            
             // Run migrations if needed
             if let db = db {
                 try await DatabaseMigrator.shared.migrateIfNeeded(db: db)
@@ -123,6 +161,18 @@ class DatabaseManager: ObservableObject {
                 }
             }
             
+            // Initialize FTS Manager
+            if let db = db {
+                ftsManager = FTSManager(database: db)
+                do {
+                    try await ftsManager?.setupFTSTables()
+                    print("FTS Manager initialized successfully")
+                } catch {
+                    print("FTS setup failed, will use LIKE queries as fallback: \(error)")
+                    // Continue without FTS - fallback to LIKE queries will be used
+                }
+            }
+            
             print("Database initialized at: \(databasePath)")
             
         } catch {
@@ -130,6 +180,9 @@ class DatabaseManager: ObservableObject {
             if let migrationError = error as? DatabaseMigrationError {
                 print("Migration error details: \(migrationError.localizedDescription)")
             }
+            
+            // If initialization fails, try to recover by creating a fresh database
+            await recoverFromDatabaseError()
         }
     }
     
@@ -138,6 +191,8 @@ class DatabaseManager: ObservableObject {
         
         // Use the new schema system for table creation
         try DatabaseSchema.createTables(db: db)
+        
+        print("Database tables created successfully")
     }
     
     // MARK: - Chat Operations
@@ -158,6 +213,13 @@ class DatabaseManager: ObservableObject {
         )
         
         try db.run(insert)
+        
+        // Sync with FTS
+        try? await ftsManager?.syncChat(
+            chatId: chat.id.uuidString,
+            title: chat.title,
+            lastMessagePreview: chat.lastMessagePreview
+        )
     }
     
     func loadChat(id: UUID) async throws -> Chat? {
@@ -185,22 +247,55 @@ class DatabaseManager: ObservableObject {
     func loadAllChats() async throws -> [Chat] {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
+        // Check if chats table exists
+        let tableExists = try await checkTableExists(db: db, tableName: "chats")
+        if !tableExists {
+            print("Chats table does not exist yet, returning empty array")
+            return []
+        }
+        
         var chatList: [Chat] = []
         let query = chats.order(chatUpdatedAt.desc)
         
-        for row in try db.prepare(query) {
-            let chat = Chat(
-                id: UUID(uuidString: row[chatId])!,
-                title: row[chatTitle],
-                createdAt: row[chatCreatedAt],
-                updatedAt: row[chatUpdatedAt],
-                llmProvider: LLMProvider(rawValue: row[chatLLMProvider])!,
-                modelName: row[chatModelName],
-                isArchived: row[chatIsArchived],
-                messageCount: row[chatMessageCount],
-                lastMessagePreview: row[chatLastMessagePreview]
-            )
-            chatList.append(chat)
+        do {
+            for row in try db.prepare(query) {
+                // Safely unwrap required values
+                guard let id = UUID(uuidString: row[chatId]),
+                      let provider = LLMProvider(rawValue: row[chatLLMProvider]) else {
+                    print("Warning: Skipping chat with invalid data")
+                    continue
+                }
+                
+                // Handle date values with error handling
+                let createdAt: Date
+                let updatedAt: Date
+                
+                do {
+                    createdAt = row[chatCreatedAt]
+                    updatedAt = row[chatUpdatedAt]
+                } catch {
+                    print("Warning: Failed to parse dates for chat \(id), using current date")
+                    createdAt = Date()
+                    updatedAt = Date()
+                }
+                
+                let chat = Chat(
+                    id: id,
+                    title: row[chatTitle],
+                    createdAt: createdAt,
+                    updatedAt: updatedAt,
+                    llmProvider: provider,
+                    modelName: row[chatModelName],
+                    isArchived: row[chatIsArchived],
+                    messageCount: row[chatMessageCount],
+                    lastMessagePreview: row[chatLastMessagePreview]
+                )
+                chatList.append(chat)
+            }
+        } catch {
+            // If the table doesn't exist or is empty, return empty array
+            print("Error loading chats: \(error)")
+            return []
         }
         
         return chatList
@@ -209,31 +304,92 @@ class DatabaseManager: ObservableObject {
     func deleteChat(id: UUID) async throws {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
+        // Remove from FTS first
+        try? await ftsManager?.removeChat(chatId: id.uuidString)
+        
         let chatToDelete = chats.filter(chatId == id.uuidString)
         try db.run(chatToDelete.delete())
+    }
+    
+    private func loadChats(byIds chatIds: [String]) async throws -> [Chat] {
+        guard let db = db else { throw DatabaseError.connectionFailed }
+        
+        var chatList: [Chat] = []
+        
+        for id in chatIds {
+            let query = chats.filter(chatId == id).limit(1)
+            
+            for row in try db.prepare(query) {
+                guard let uuid = UUID(uuidString: row[chatId]),
+                      let provider = LLMProvider(rawValue: row[chatLLMProvider]) else {
+                    continue
+                }
+                
+                let chat = Chat(
+                    id: uuid,
+                    title: row[chatTitle],
+                    createdAt: row[chatCreatedAt],
+                    updatedAt: row[chatUpdatedAt],
+                    llmProvider: provider,
+                    modelName: row[chatModelName],
+                    isArchived: row[chatIsArchived],
+                    messageCount: row[chatMessageCount],
+                    lastMessagePreview: row[chatLastMessagePreview]
+                )
+                chatList.append(chat)
+            }
+        }
+        
+        return chatList
     }
     
     func searchChats(query: String) async throws -> [Chat] {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
+        // Try FTS search first if available
+        if let ftsManager = ftsManager {
+            do {
+                let chatIds = try await ftsManager.searchChats(query: query)
+                if !chatIds.isEmpty {
+                    return try await loadChats(byIds: chatIds)
+                }
+            } catch {
+                print("FTS search failed, falling back to LIKE query: \(error)")
+            }
+        }
+        
+        // Fallback to LIKE query
         var chatList: [Chat] = []
         let searchQuery = chats.filter(chatTitle.like("%\(query)%") || 
                                      chatLastMessagePreview.like("%\(query)%"))
                                .order(chatUpdatedAt.desc)
         
-        for row in try db.prepare(searchQuery) {
-            let chat = Chat(
-                id: UUID(uuidString: row[chatId])!,
-                title: row[chatTitle],
-                createdAt: row[chatCreatedAt],
-                updatedAt: row[chatUpdatedAt],
-                llmProvider: LLMProvider(rawValue: row[chatLLMProvider])!,
-                modelName: row[chatModelName],
-                isArchived: row[chatIsArchived],
-                messageCount: row[chatMessageCount],
-                lastMessagePreview: row[chatLastMessagePreview]
-            )
-            chatList.append(chat)
+        do {
+            for row in try db.prepare(searchQuery) {
+                // Safely unwrap required values
+                guard let id = UUID(uuidString: row[chatId]),
+                      let provider = LLMProvider(rawValue: row[chatLLMProvider]) else {
+                    print("Warning: Skipping chat with invalid data")
+                    continue
+                }
+                
+                let chat = Chat(
+                    id: id,
+                    title: row[chatTitle],
+                    createdAt: row[chatCreatedAt],
+                    updatedAt: row[chatUpdatedAt],
+                    llmProvider: provider,
+                    modelName: row[chatModelName],
+                    isArchived: row[chatIsArchived],
+                    messageCount: row[chatMessageCount],
+                    lastMessagePreview: row[chatLastMessagePreview]
+                )
+                chatList.append(chat)
+            }
+        } catch {
+            // If search fails, return empty array
+            print("Error searching chats: \(error)")
+            return []
         }
         
         return chatList
@@ -431,24 +587,64 @@ class DatabaseManager: ObservableObject {
     func saveMessage(_ message: Message) async throws {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
-        let insert = messages.insert(or: .replace,
-            messageId <- message.id.uuidString,
-            messageChatId <- message.chatId.uuidString,
-            messageContent <- message.content,
-            messageIsUser <- message.isUser,
-            messageTimestamp <- message.timestamp,
-            messageImageData <- message.imageData,
-            messageStatus <- message.status.rawValue,
-            messageEditedAt <- message.editedAt,
-            messageModel <- message.metadata?.model,
-            messageProvider <- message.metadata?.provider?.rawValue,
-            messageResponseTime <- message.metadata?.responseTime,
-            messagePromptTokens <- message.metadata?.promptTokens,
-            messageResponseTokens <- message.metadata?.responseTokens,
-            messageTotalTokens <- message.metadata?.totalTokens
+        try db.transaction {
+            let insert = messages.insert(or: .replace,
+                messageId <- message.id.uuidString,
+                messageChatId <- message.chatId.uuidString,
+                messageContent <- message.content,
+                messageIsUser <- message.isUser,
+                messageTimestamp <- message.timestamp,
+                messageImageData <- message.imageData,
+                messageStatus <- message.status.rawValue,
+                messageEditedAt <- message.editedAt,
+                messageModel <- message.metadata?.model,
+                messageProvider <- message.metadata?.provider?.rawValue,
+                messageResponseTime <- message.metadata?.responseTime,
+                messagePromptTokens <- message.metadata?.promptTokens,
+                messageResponseTokens <- message.metadata?.responseTokens,
+                messageTotalTokens <- message.metadata?.totalTokens
+            )
+            
+            try db.run(insert)
+        }
+        
+        // Sync with FTS
+        try? await ftsManager?.syncMessage(
+            messageId: message.id.uuidString,
+            content: message.content
         )
         
-        try db.run(insert)
+        // Update chat's message count and last message preview
+        await updateChatStats(chatId: message.chatId)
+    }
+    
+    func updateMessage(_ message: Message) async throws {
+        guard let db = db else { throw DatabaseError.connectionFailed }
+        
+        // First check if message exists
+        let existingMessage = messages.filter(messageId == message.id.uuidString)
+        let count = try db.scalar(existingMessage.count)
+        
+        if count > 0 {
+            // Update existing message in a transaction
+            try db.transaction {
+                let update = existingMessage.update(
+                    messageContent <- message.content,
+                    messageStatus <- message.status.rawValue,
+                    messageEditedAt <- message.editedAt,
+                    messageModel <- message.metadata?.model,
+                    messageProvider <- message.metadata?.provider?.rawValue,
+                    messageResponseTime <- message.metadata?.responseTime,
+                    messagePromptTokens <- message.metadata?.promptTokens,
+                    messageResponseTokens <- message.metadata?.responseTokens,
+                    messageTotalTokens <- message.metadata?.totalTokens
+                )
+                try db.run(update)
+            }
+        } else {
+            // If message doesn't exist, save it
+            try await saveMessage(message)
+        }
         
         // Update chat's message count and last message preview
         await updateChatStats(chatId: message.chatId)
@@ -507,6 +703,9 @@ class DatabaseManager: ObservableObject {
             chatIdToUpdate = UUID(uuidString: row[messageChatId])
         }
         
+        // Remove from FTS first
+        try? await ftsManager?.removeMessage(messageId: id.uuidString)
+        
         // Delete the message
         let messageToDelete = messages.filter(messageId == id.uuidString)
         try db.run(messageToDelete.delete())
@@ -520,6 +719,22 @@ class DatabaseManager: ObservableObject {
     func searchMessages(query: String, in chatId: UUID? = nil) async throws -> [Message] {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
+        // Try FTS search first if available
+        if let ftsManager = ftsManager {
+            do {
+                let messageIds = try await ftsManager.searchMessages(
+                    query: query,
+                    chatId: chatId?.uuidString
+                )
+                if !messageIds.isEmpty {
+                    return try await loadMessages(byIds: messageIds)
+                }
+            } catch {
+                print("FTS search failed, falling back to LIKE query: \(error)")
+            }
+        }
+        
+        // Fallback to LIKE query
         var messageList: [Message] = []
         var searchQuery = messages.filter(messageContent.like("%\(query)%"))
         
@@ -564,34 +779,147 @@ class DatabaseManager: ObservableObject {
         return messageList
     }
     
+    private func loadMessages(byIds messageIds: [String]) async throws -> [Message] {
+        guard let db = db else { throw DatabaseError.connectionFailed }
+        
+        var messageList: [Message] = []
+        
+        for id in messageIds {
+            let query = messages.filter(messageId == id).limit(1)
+            
+            for row in try db.prepare(query) {
+                // Only create metadata if at least one field has a value
+                let metadata: MessageMetadata?
+                if row[messageModel] != nil || row[messageProvider] != nil || 
+                   row[messageResponseTime] != nil || row[messagePromptTokens] != nil ||
+                   row[messageResponseTokens] != nil || row[messageTotalTokens] != nil {
+                    metadata = MessageMetadata(
+                        model: row[messageModel],
+                        provider: row[messageProvider] != nil ? LLMProvider(rawValue: row[messageProvider]!) : nil,
+                        responseTime: row[messageResponseTime],
+                        promptTokens: row[messagePromptTokens],
+                        responseTokens: row[messageResponseTokens],
+                        totalTokens: row[messageTotalTokens]
+                    )
+                } else {
+                    metadata = nil
+                }
+                
+                let message = Message(
+                    id: UUID(uuidString: row[messageId])!,
+                    chatId: UUID(uuidString: row[messageChatId])!,
+                    content: row[messageContent],
+                    isUser: row[messageIsUser],
+                    timestamp: row[messageTimestamp],
+                    imageData: row[messageImageData],
+                    metadata: metadata,
+                    status: MessageStatus(rawValue: row[messageStatus])!,
+                    editedAt: row[messageEditedAt]
+                )
+                messageList.append(message)
+            }
+        }
+        
+        return messageList
+    }
+    
     // MARK: - Helper Methods
+    
+    private func checkTableExists(db: Connection, tableName: String) async throws -> Bool {
+        let query = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?"
+        let count = try db.scalar(query, tableName) as! Int64
+        return count > 0
+    }
+    
+    private func validateDatabaseFile() async -> Bool {
+        do {
+            // Try to open a temporary connection to validate the database
+            let tempDb = try Connection(databasePath)
+            
+            // Try a simple query to see if the database is readable
+            _ = try tempDb.scalar("SELECT COUNT(*) FROM sqlite_master")
+            
+            // If we have tables, try to query the chats table
+            if try tempDb.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='chats'") as! Int64 > 0 {
+                // Try to count chats - this will fail if date format is wrong
+                _ = try tempDb.prepare("SELECT * FROM chats LIMIT 1")
+            }
+            
+            return true
+        } catch {
+            print("Database validation failed: \(error)")
+            return false
+        }
+    }
+    
+    private func recoverFromDatabaseError() async {
+        print("Attempting to recover from database error...")
+        
+        // Close any existing connection
+        db = nil
+        
+        // Remove the corrupted database
+        try? FileManager.default.removeItem(atPath: databasePath)
+        try? FileManager.default.removeItem(atPath: databasePath + "-wal")
+        try? FileManager.default.removeItem(atPath: databasePath + "-shm")
+        
+        // Try to reinitialize with a fresh database
+        do {
+            db = try Connection(databasePath)
+            
+            // Create fresh tables
+            if let db = db {
+                try DatabaseSchema.createTables(db: db)
+                print("Successfully created fresh database")
+            }
+        } catch {
+            print("Failed to recover database: \(error)")
+        }
+    }
     
     private func updateChatStats(chatId: UUID) async {
         guard let db = db else { return }
         
         do {
-            // Count messages in this chat
-            let messageCount = try db.scalar(messages.filter(messageChatId == chatId.uuidString).count)
-            
-            // Get the latest message for preview
-            let latestMessageQuery = messages.filter(messageChatId == chatId.uuidString)
-                                           .order(messageTimestamp.desc)
-                                           .limit(1)
-            
-            var lastMessagePreview: String?
-            for row in try db.prepare(latestMessageQuery) {
-                let content = row[messageContent]
-                lastMessagePreview = String(content.prefix(100))
+            try db.transaction {
+                // Count messages in this chat
+                let messageCount = try db.scalar(messages.filter(messageChatId == chatId.uuidString).count)
+                
+                // Get the latest message for preview
+                let latestMessageQuery = messages.filter(messageChatId == chatId.uuidString)
+                                               .order(messageTimestamp.desc)
+                                               .limit(1)
+                
+                var lastMessagePreview: String?
+                for row in try db.prepare(latestMessageQuery) {
+                    let content = row[messageContent]
+                    lastMessagePreview = String(content.prefix(100))
+                }
+                
+                // Get chat title for FTS sync
+                var chatTitle = ""
+                let chatQuery = chats.filter(self.chatId == chatId.uuidString).limit(1)
+                for row in try db.prepare(chatQuery) {
+                    chatTitle = row[self.chatTitle]
+                }
+                
+                // Update the chat
+                let chatToUpdate = chats.filter(self.chatId == chatId.uuidString)
+                try db.run(chatToUpdate.update(
+                    chatMessageCount <- messageCount,
+                    chatLastMessagePreview <- lastMessagePreview,
+                    chatUpdatedAt <- Date()
+                ))
+                
+                // Sync with FTS after the transaction
+                Task {
+                    try? await self.ftsManager?.syncChat(
+                        chatId: chatId.uuidString,
+                        title: chatTitle,
+                        lastMessagePreview: lastMessagePreview
+                    )
+                }
             }
-            
-            // Update the chat
-            let chatToUpdate = chats.filter(self.chatId == chatId.uuidString)
-            try db.run(chatToUpdate.update(
-                chatMessageCount <- messageCount,
-                chatLastMessagePreview <- lastMessagePreview,
-                chatUpdatedAt <- Date()
-            ))
-            
         } catch {
             print("Error updating chat stats: \(error)")
         }
