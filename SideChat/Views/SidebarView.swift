@@ -23,7 +23,8 @@ struct SidebarView: View {
     @State private var isRenamingChat = false
     @State private var renameChatTitle = ""
     @StateObject private var chatListViewModel = ChatListViewModel()
-    private var chatListWindow: NSWindow?
+    @State private var showChatList = false
+    @FocusState private var isMessageFieldFocused: Bool
     
     // MARK: - Initialization
     
@@ -37,8 +38,41 @@ struct SidebarView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Main content area with chat view
-            ChatView(viewModel: chatViewModel)
+            // Main content area with chat view or chat list
+            ZStack {
+                // Chat view (default state)
+                ChatView(viewModel: chatViewModel)
+                    .opacity(showChatList ? 0 : 1)
+                    .scaleEffect(showChatList ? 0.95 : 1.0)
+                    .zIndex(showChatList ? 0 : 1)
+                
+                // Inline chat list view
+                if showChatList {
+                    InlineChatListView(
+                        chatListViewModel: chatListViewModel,
+                        selectedChatId: $selectedChatId,
+                        onChatSelected: { chatId in
+                            Task {
+                                await switchToChat(chatId)
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    showChatList = false
+                                }
+                                // Delay focus to ensure view transition is complete
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                    isMessageFieldFocused = true
+                                }
+                            }
+                        },
+                        onClose: {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                showChatList = false
+                            }
+                        }
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    .zIndex(1)
+                }
+            }
             
             // Combined input and toolbar area
             inputToolbar
@@ -202,14 +236,6 @@ struct SidebarView: View {
         }
     }
     
-    private var recentChats: [Chat] {
-        // Get the most recent 20 chats, sorted by update date
-        return chatListViewModel.chats
-            .filter { !$0.isArchived }
-            .sorted { $0.updatedAt > $1.updatedAt }
-            .prefix(20)
-            .map { $0 }
-    }
     
     private var inputToolbar: some View {
         VStack(spacing: 0) {
@@ -226,58 +252,17 @@ struct SidebarView: View {
                 .buttonStyle(PlainButtonStyle())
                 .help("New Chat")
                 
-                Menu {
-                    // Recent chats section
-                    if !recentChats.isEmpty {
-                        Section("Recent Chats") {
-                            ForEach(recentChats) { chat in
-                                Button(action: { 
-                                    Task {
-                                        await switchToChat(chat.id)
-                                    }
-                                }) {
-                                    Label {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(chat.displayTitle)
-                                                .lineLimit(1)
-                                            if let preview = chat.lastMessagePreview {
-                                                Text(preview)
-                                                    .font(.caption)
-                                                    .foregroundColor(.secondary)
-                                                    .lineLimit(1)
-                                            }
-                                        }
-                                    } icon: {
-                                        Image(systemName: providerIcon(for: chat.llmProvider))
-                                            .foregroundColor(providerColor(for: chat.llmProvider))
-                                    }
-                                }
-                            }
-                        }
-                        
-                        Divider()
+                Button(action: { 
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showChatList.toggle()
                     }
-                    
-                    // Action to open full list with search
-                    Button(action: { openChatListWindow() }) {
-                        Label("Search All Chats...", systemImage: "magnifyingglass")
-                    }
-                    
-                    Divider()
-                    
-                    // New chat option
-                    Button(action: createNewChat) {
-                        Label("New Chat", systemImage: "plus.bubble")
-                    }
-                } label: {
-                    Image(systemName: "list.bullet")
+                }) {
+                    Image(systemName: showChatList ? "xmark" : "list.bullet")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Color.primary.opacity(0.7))
                 }
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .fixedSize()
-                .help("Chat History")
+                .buttonStyle(PlainButtonStyle())
+                .help(showChatList ? "Close Chat List" : "Chat History")
                 
                 if enableImageUploads {
                     Button(action: { showImagePicker = true }) {
@@ -297,6 +282,7 @@ struct SidebarView: View {
                     .textFieldStyle(PlainTextFieldStyle())
                     .font(.body)
                     .lineLimit(1...5)
+                    .focused($isMessageFieldFocused)
                     .onSubmit {
                         sendMessage()
                     }
@@ -381,46 +367,6 @@ struct SidebarView: View {
         }
     }
     
-    private func showChatListPopover() {
-        openChatListWindow()
-    }
-    
-    private func openChatListWindow() {
-        // Create a binding that will notify us when to close the window
-        let shouldCloseBinding = Binding<Bool>(
-            get: { false },
-            set: { _ in }
-        )
-        
-        let chatListView = NavigationStack {
-            ChatListView(
-                isPresented: shouldCloseBinding,
-                selectedChatId: $selectedChatId
-            )
-            .frame(minWidth: 400, minHeight: 500)
-        }
-        
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 600, height: 700),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
-            backing: .buffered,
-            defer: false
-        )
-        
-        window.title = "Chat History"
-        window.center()
-        window.contentView = NSHostingView(rootView: chatListView)
-        window.makeKeyAndOrderFront(nil)
-        
-        // Set minimum size
-        window.minSize = NSSize(width: 400, height: 500)
-        
-        // Make the window level normal so it can be properly activated
-        window.level = .normal
-        
-        // Ensure the window can become key
-        window.isReleasedWhenClosed = false
-    }
     
     private func togglePin() {
         let currentState = SidebarWindowController.shared.isSidebarPinned
@@ -566,6 +512,261 @@ struct SidebarView: View {
 extension Notification.Name {
     static let paste = Notification.Name("NSPasteboardDidChangeNotification")
 }
+
+// MARK: - Inline Chat List View
+
+/// A streamlined inline chat list view that appears in place of the chat area
+struct InlineChatListView: View {
+    @ObservedObject var chatListViewModel: ChatListViewModel
+    @Binding var selectedChatId: UUID?
+    let onChatSelected: (UUID) -> Void
+    let onClose: () -> Void
+    
+    @FocusState private var isSearchFocused: Bool
+    @Default(.colorTheme) private var colorTheme
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with search and close button
+            headerView
+            
+            // Chat list content
+            if chatListViewModel.isLoading {
+                loadingView
+            } else if chatListViewModel.hasFilteredChats {
+                chatListView
+            } else {
+                emptyStateView
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(NSColor.controlBackgroundColor).opacity(0.95))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+        )
+        .onAppear {
+            chatListViewModel.selectedChatId = selectedChatId
+            isSearchFocused = true
+        }
+    }
+    
+    private var headerView: some View {
+        VStack(spacing: 12) {
+            // Header with close button
+            HStack {
+                Text("Chat History")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            // Search bar
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.secondary)
+                    .font(.system(size: 14))
+                
+                TextField("Search chats...", text: $chatListViewModel.searchText)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .font(.system(size: 14))
+                    .focused($isSearchFocused)
+                
+                if !chatListViewModel.searchText.isEmpty {
+                    Button(action: { chatListViewModel.searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 14))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.primary.opacity(0.05))
+            )
+            
+            // Filter options (simplified)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach([Chat.FilterOption.active, .openai, .anthropic, .google, .local], id: \.self) { option in
+                        FilterChip(
+                            title: option.displayName,
+                            isSelected: chatListViewModel.filterOption == option,
+                            action: { chatListViewModel.filterOption = option }
+                        )
+                    }
+                }
+                .padding(.horizontal, 4)
+            }
+        }
+        .padding(16)
+    }
+    
+    private var chatListView: some View {
+        ScrollView {
+            LazyVStack(spacing: 2) {
+                ForEach(chatListViewModel.filteredChats) { chat in
+                    InlineChatListItemView(
+                        chat: chat,
+                        isSelected: selectedChatId == chat.id,
+                        onSelect: {
+                            onChatSelected(chat.id)
+                        }
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
+    }
+    
+    private var emptyStateView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "bubble.left.and.bubble.right")
+                .font(.system(size: 48))
+                .foregroundColor(.secondary.opacity(0.5))
+            
+            Text(chatListViewModel.emptyStateMessage)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+    }
+    
+    private var loadingView: some View {
+        VStack {
+            ProgressView()
+                .scaleEffect(0.8)
+            Text("Loading chats...")
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .padding(.top, 8)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Inline Chat List Item View
+
+struct InlineChatListItemView: View {
+    let chat: Chat
+    let isSelected: Bool
+    let onSelect: () -> Void
+    
+    @State private var isHovering = false
+    @Default(.colorTheme) private var colorTheme
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Provider icon
+            Image(systemName: providerIcon)
+                .font(.system(size: 16))
+                .foregroundColor(providerColor)
+                .frame(width: 24, height: 24)
+            
+            // Chat info
+            VStack(alignment: .leading, spacing: 2) {
+                Text(chat.displayTitle)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.primary)
+                    .lineLimit(1)
+                
+                if let preview = chat.lastMessagePreview {
+                    Text(preview)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            
+            Spacer()
+            
+            // Time
+            Text(chat.relativeUpdatedDate)
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(backgroundColor)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(borderColor, lineWidth: 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onSelect)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovering = hovering
+            }
+        }
+    }
+    
+    private var backgroundColor: Color {
+        if isSelected {
+            return colorTheme.color.opacity(0.15)
+        } else if isHovering {
+            return Color.primary.opacity(0.05)
+        } else {
+            return Color.clear
+        }
+    }
+    
+    private var borderColor: Color {
+        if isSelected {
+            return colorTheme.color.opacity(0.3)
+        } else {
+            return Color.clear
+        }
+    }
+    
+    private var providerIcon: String {
+        switch chat.llmProvider {
+        case .openai:
+            return "brain"
+        case .anthropic:
+            return "ant.circle"
+        case .google:
+            return "sparkle"
+        case .local:
+            return "desktopcomputer"
+        }
+    }
+    
+    private var providerColor: Color {
+        switch chat.llmProvider {
+        case .openai:
+            return .green
+        case .anthropic:
+            return .orange
+        case .google:
+            return .blue
+        case .local:
+            return .purple
+        }
+    }
+}
+
 
 // MARK: - Preview
 
