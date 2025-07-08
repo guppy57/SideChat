@@ -36,9 +36,15 @@ class ChatViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(chatId: UUID? = nil) {
+    init(chatId: UUID? = nil, useMockService: Bool = true) {
         self.chatId = chatId ?? UUID()
         self.databaseManager = DatabaseManager.shared
+        
+        // Initialize mock service for development
+        // TODO: Replace with real service initialization based on settings
+        if useMockService {
+            self.llmService = MockLLMService(provider: defaultProvider)
+        }
         
         // Load messages on init
         Task {
@@ -198,28 +204,21 @@ class ChatViewModel: ObservableObject {
         }
         
         do {
-            // For now, use mock response
-            // TODO: Use real LLM service when available
-            if llmService == nil {
-                // Simulate streaming with mock data
-                await mockStreamingResponse(for: &botMessage)
-            } else {
-                // Real LLM service implementation
-                guard let service = llmService else {
-                    throw LLMServiceError.notConfigured
-                }
-                
-                let stream = try await service.sendMessage(
-                    content: userMessage.content,
-                    images: userMessage.imageData != nil ? [userMessage.imageData!] : [],
-                    chatHistory: messages.dropLast() // Exclude the bot message we just added
-                )
-                
-                // Process stream
-                for try await chunk in stream {
-                    botMessage.appendContent(chunk)
-                    updateStreamingMessage(botMessage)
-                }
+            // Use LLM service (mock or real)
+            guard let service = llmService else {
+                throw LLMServiceError.notConfigured
+            }
+            
+            let stream = try await service.sendMessage(
+                content: userMessage.content,
+                images: userMessage.imageData != nil ? [userMessage.imageData!] : [],
+                chatHistory: messages.dropLast() // Exclude the bot message we just added
+            )
+            
+            // Process stream
+            for try await chunk in stream {
+                botMessage.appendContent(chunk)
+                updateStreamingMessage(botMessage)
             }
             
             // Mark as complete
@@ -237,20 +236,6 @@ class ChatViewModel: ObservableObject {
         }
     }
     
-    /// Mock streaming response for testing
-    private func mockStreamingResponse(for message: inout Message) async {
-        let mockResponse = "I understand you're asking about \(message.content.prefix(50))...\n\nThis is a mock response that simulates streaming. In a real implementation, this would connect to an actual LLM service.\n\nThe response is being streamed word by word to demonstrate the streaming functionality."
-        
-        let words = mockResponse.split(separator: " ")
-        
-        for word in words {
-            message.appendContent(String(word) + " ")
-            updateStreamingMessage(message)
-            
-            // Simulate network delay
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
-        }
-    }
     
     /// Update the streaming message in the array
     private func updateStreamingMessage(_ message: Message) {

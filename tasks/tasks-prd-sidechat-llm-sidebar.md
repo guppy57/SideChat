@@ -111,9 +111,8 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 4.10 Create proper chat input field with multiline support - Already implemented in SidebarView
   - [x] 4.18 Create ChatViewModel to manage chat state and operations - PRIORITY: Foundation for all chat features
   - [x] 4.11 Add send button functionality and keyboard shortcuts - Connect to ChatViewModel
-  - [ ] 4.22 Create MockLLMService for testing streaming and responses
-  - [ ] 4.7 Create typing indicator for LLM responses
-  - [ ] 4.8 Implement message streaming using URLSession.shared.bytes
+  - [x] 4.22 Create MockLLMService for testing streaming and responses
+  - [x] 4.7 Create typing indicator for LLM responses
   - [ ] 4.9 Add message copy functionality for individual messages
   - [ ] 4.17 Add loading states and error handling throughout UI
   - [ ] 4.19 Create SidebarViewModel for overall sidebar state management
@@ -127,22 +126,23 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
 
 - [ ] 5.0 Integrate LLM providers and API services
   - [ ] 5.1 Create KeychainManager for secure API key storage
-  - [ ] 5.2 Implement OpenAIService using URLSession with streaming
-  - [ ] 5.3 Implement AnthropicService with SSE parsing
-  - [ ] 5.4 Implement GoogleAIService with consistent message building
-  - [ ] 5.5 Implement LocalModelService for local model integration
-  - [ ] 5.6 Add image input support for compatible providers
-  - [ ] 5.7 Implement error handling and user-friendly messages
-  - [ ] 5.8 Add API rate limiting and timeout handling
-  - [ ] 5.9 Implement automatic chat title generation
-  - [ ] 5.10 Add LLM provider factory and selection logic
-  - [ ] 5.11 Add API key validation and testing
-  - [ ] 5.12 Create comprehensive unit tests for all services
-  - [ ] 5.13 Add network connectivity checks
-  - [ ] 5.14 Implement conversation context management
-  - [ ] 5.15 Add token counting and usage tracking
-  - [ ] 5.16 Add a copy to clipboard button underneath the chats for LLMs and for the chats the user sends
-  - [ ] 5.17 Add a retry button to retry the LLM-api request for LLM produced chats
+  - [ ] 5.2 Implement message streaming using URLSession.shared.bytes (infrastructure for all services)
+  - [ ] 5.3 Implement OpenAIService using URLSession with streaming
+  - [ ] 5.4 Implement AnthropicService with SSE parsing
+  - [ ] 5.5 Implement GoogleAIService with consistent message building
+  - [ ] 5.6 Implement LocalModelService for local model integration
+  - [ ] 5.7 Add image input support for compatible providers
+  - [ ] 5.8 Implement error handling and user-friendly messages
+  - [ ] 5.9 Add API rate limiting and timeout handling
+  - [ ] 5.10 Implement automatic chat title generation
+  - [ ] 5.11 Add LLM provider factory and selection logic
+  - [ ] 5.12 Add API key validation and testing
+  - [ ] 5.13 Create comprehensive unit tests for all services
+  - [ ] 5.14 Add network connectivity checks
+  - [ ] 5.15 Implement conversation context management
+  - [ ] 5.16 Add token counting and usage tracking
+  - [ ] 5.17 Add a copy to clipboard button underneath the chats for LLMs and for the chats the user sends
+  - [ ] 5.18 Add a retry button to retry the LLM-api request for LLM produced chats
 
 - [ ] 6.0 Create settings and customization features
   - [ ] 6.1 Create SettingsView with tabbed interface
@@ -184,7 +184,7 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
 2. **Connect send button functionality (4.11)** - Wire up existing UI to ChatViewModel
 3. **Create MockLLMService (4.22)** - Test service for simulating LLM responses
 4. **Implement typing indicator (4.7)** - Visual feedback during LLM responses
-5. **Add message streaming (4.8)** - Real-time updates as LLM generates responses
+5. **Continue with remaining UI tasks** - Copy functionality, error handling, chat list, etc.
 
 ## Notes on Current Implementation
 
