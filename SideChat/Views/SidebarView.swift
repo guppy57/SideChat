@@ -1,5 +1,6 @@
 import SwiftUI
 import Defaults
+import UniformTypeIdentifiers
 
 // MARK: - Sidebar View
 
@@ -10,8 +11,12 @@ struct SidebarView: View {
     
     @Default(.sidebarTransparency) private var transparency
     @Default(.colorTheme) private var colorTheme
+    @Default(.enableImageUploads) private var enableImageUploads
     @State private var messageText = ""
     @State private var currentChatId = UUID() // TODO: Load from database or create new
+    @State private var selectedImageData: Data? = nil
+    @State private var showImagePicker = false
+    @State private var isDragTargeted = false
     
     // MARK: - Body
     
@@ -19,6 +24,16 @@ struct SidebarView: View {
         VStack(spacing: 0) {
             // Main content area with chat view
             ChatView(chatId: currentChatId)
+            
+            // Image preview if present
+            if let imageData = selectedImageData {
+                ImagePreviewView(imageData: imageData) {
+                    selectedImageData = nil
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
             
             // Combined input and toolbar area - iMessage style
             HStack(spacing: 8) {
@@ -38,6 +53,17 @@ struct SidebarView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .help("Chat History")
+                
+                // Image upload button
+                if enableImageUploads {
+                    Button(action: { showImagePicker = true }) {
+                        Image(systemName: "photo")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(Color.primary.opacity(0.7))
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .help("Attach Image")
+                }
                 
                 Divider()
                     .frame(height: 20)
@@ -114,6 +140,30 @@ struct SidebarView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.clear) // Completely transparent background
+        .onDrop(of: [.image, .fileURL], isTargeted: $isDragTargeted, perform: handleDrop)
+        .overlay {
+            if isDragTargeted && enableImageUploads {
+                ZStack {
+                    Color.black.opacity(0.7)
+                    VStack(spacing: 8) {
+                        Image(systemName: "photo.badge.plus")
+                            .font(.system(size: 60))
+                        Text("Drop image here")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                }
+                .allowsHitTesting(false)
+                .animation(.easeInOut(duration: 0.2), value: isDragTargeted)
+            }
+        }
+        .background {
+            ImagePickerView(selectedImageData: $selectedImageData, isPresented: $showImagePicker)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .paste)) { _ in
+            handlePaste()
+        }
     }
     
     // MARK: - Computed Properties
@@ -152,13 +202,58 @@ struct SidebarView: View {
     private func sendMessage() {
         // TODO: Implement message sending to LLM
         let trimmedMessage = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmedMessage.isEmpty {
+        if !trimmedMessage.isEmpty || selectedImageData != nil {
             print("Sending message: \(trimmedMessage)")
+            if let imageData = selectedImageData {
+                print("With image of size: \(imageData.count) bytes")
+            }
             messageText = "" // Clear the input field
+            selectedImageData = nil // Clear the image
+        }
+    }
+    
+    private func handleDrop(providers: [NSItemProvider]) -> Bool {
+        guard enableImageUploads else { return false }
+        
+        let dropDelegate = ImageDropDelegate(
+            droppedImageData: $selectedImageData,
+            isDragTargeted: $isDragTargeted
+        )
+        
+        // Use the drop delegate's logic
+        for provider in providers {
+            if provider.hasItemConformingToTypeIdentifier("public.image") {
+                provider.loadDataRepresentation(forTypeIdentifier: "public.image") { data, error in
+                    DispatchQueue.main.async {
+                        if let data = data,
+                           data.count <= 20 * 1024 * 1024, // 20MB limit
+                           NSImage(data: data) != nil {
+                            selectedImageData = data
+                        }
+                        isDragTargeted = false
+                    }
+                }
+                return true
+            }
+        }
+        
+        return false
+    }
+    
+    private func handlePaste() {
+        guard enableImageUploads else { return }
+        
+        if let imageData = ClipboardImageHandler.getImageFromClipboard() {
+            selectedImageData = imageData
         }
     }
 }
 
+// MARK: - Notification Extension
+
+extension Notification.Name {
+    static let paste = Notification.Name("NSPasteboardDidChangeNotification")
+}
 
 // MARK: - Preview
 

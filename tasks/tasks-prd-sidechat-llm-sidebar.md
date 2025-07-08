@@ -105,7 +105,7 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 4.1 Create basic SidebarView placeholder with header and input (SidebarView.swift) - Refactored with bottom-up layout
   - [x] 4.2 Create ChatView with scrollable message list
   - [x] 4.3 Implement ChatBubbleView using custom Shape with Path-based tail drawing
-  - [ ] 4.4 Add proper message alignment (user right, LLM left)
+  - [x] 4.4 Add proper message alignment (user right, LLM left)
   - [x] 4.5 Implement markdown rendering using MarkdownUI package
   - [ ] 4.6 Add image upload and display functionality
   - [ ] 4.7 Create typing indicator for LLM responses

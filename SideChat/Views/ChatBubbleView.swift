@@ -26,32 +26,44 @@ struct ChatBubbleView: View {
                 // Message bubble with tail
                 ZStack(alignment: message.isUser ? .bottomTrailing : .bottomLeading) {
                     // Message content
-                    Group {
-                        if enableMarkdownRendering && !message.isUser {
-                            // Use markdown for bot messages
-                            Markdown(message.content)
-                                .markdownTheme(markdownTheme)
-                                .font(.system(size: CGFloat(fontSize)))
-                        } else {
-                            // Plain text for user messages or when markdown is disabled
-                            Text(message.content)
-                                .font(.system(size: CGFloat(fontSize)))
-                                .foregroundColor(message.isUser ? .white : .primary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        // Image content if present
+                        if let imageData = message.imageData,
+                           let nsImage = NSImage(data: imageData) {
+                            Image(nsImage: nsImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: 300, maxHeight: 300)
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                                )
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                        }
+                        
+                        // Text content if present
+                        if !message.content.isEmpty {
+                            Group {
+                                if enableMarkdownRendering && !message.isUser {
+                                    // Use markdown for bot messages
+                                    Markdown(message.content)
+                                        .markdownTheme(markdownTheme)
+                                        .font(.system(size: CGFloat(fontSize)))
+                                } else {
+                                    // Plain text for user messages or when markdown is disabled
+                                    Text(message.content)
+                                        .font(.system(size: CGFloat(fontSize)))
+                                        .foregroundColor(message.isUser ? .white : .primary)
+                                }
+                            }
                         }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .background(
-                            ZStack {
-                                BubbleShape(isFromUser: message.isUser)
-                                    .fill(message.isUser ? accentColor.opacity(0.85) : Color(NSColor.controlBackgroundColor).opacity(0.95))
-                                
-                                BubbleShape(isFromUser: message.isUser)
-                                    .fill(
-                                        .regularMaterial.opacity(message.isUser ? 0.3 : 0.6)
-                                    )
-                            }
-                        )
+                        BubbleBackground(isUser: message.isUser, colorTheme: colorTheme)
+                    )
                         .overlay(
                             BubbleShape(isFromUser: message.isUser)
                                 .stroke(bubbleBorder, lineWidth: 0.5)
@@ -123,7 +135,7 @@ struct ChatBubbleView: View {
                     FontSize(CGFloat(fontSize))
                 }
                 .link {
-                    ForegroundColor(accentColor)
+                    ForegroundColor(colorTheme.color)
                     UnderlineStyle(.single)
                 }
                 .code {
@@ -167,19 +179,9 @@ struct ChatBubbleView: View {
     
     private var bubbleBorder: Color {
         if message.isUser {
-            return accentColor.opacity(0.3)
+            return colorTheme.color.opacity(0.3)
         } else {
             return Color.primary.opacity(0.1)
-        }
-    }
-    
-    private var accentColor: Color {
-        switch colorTheme {
-        case .blue: return .blue
-        case .green: return .green
-        case .purple: return .purple
-        case .orange: return .orange
-        case .gray: return .gray
         }
     }
 }
@@ -340,6 +342,25 @@ struct ChatBubbleView_Previews: PreviewProvider {
                     content: "Failed message example",
                     isUser: true,
                     status: .failed
+                )
+            )
+            
+            // Image message examples
+            ChatBubbleView(
+                message: Message(
+                    chatId: UUID(),
+                    content: "Check out this image!",
+                    isUser: true,
+                    imageData: NSImage(systemSymbolName: "photo.fill", accessibilityDescription: nil)?.tiffRepresentation
+                )
+            )
+            
+            ChatBubbleView(
+                message: Message(
+                    chatId: UUID(),
+                    content: "Here's the analysis of your image:\n\nThe image shows a beautiful landscape with mountains in the background.",
+                    isUser: false,
+                    imageData: NSImage(systemSymbolName: "mountain.2.fill", accessibilityDescription: nil)?.tiffRepresentation
                 )
             )
         }

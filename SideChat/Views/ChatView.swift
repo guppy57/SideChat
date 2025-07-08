@@ -45,6 +45,7 @@ struct ChatView: View {
                     }
                 }
             }
+            .scrollIndicators(.hidden)
             .defaultScrollAnchor(.bottom)
         }
         .background(Color.clear)

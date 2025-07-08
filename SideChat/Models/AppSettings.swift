@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import Defaults
 
 // MARK: - App Settings Model
@@ -64,6 +65,26 @@ enum ColorTheme: String, CaseIterable, Defaults.Serializable {
         case .purple: return "Purple"
         case .orange: return "Orange"
         case .gray: return "Gray"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .blue: return .blue
+        case .green: return .green
+        case .purple: return .purple
+        case .orange: return .orange
+        case .gray: return .gray
+        }
+    }
+    
+    var nsColor: NSColor {
+        switch self {
+        case .blue: return .systemBlue
+        case .green: return .systemGreen
+        case .purple: return .systemPurple
+        case .orange: return .systemOrange
+        case .gray: return .systemGray
         }
     }
 }
