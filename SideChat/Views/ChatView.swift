@@ -36,7 +36,12 @@ struct ChatView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
+                    
+                    // Bottom buffer to allow scrolling content above gradient
+                    Color.clear
+                        .frame(height: 30)
                 }
                 .frame(maxWidth: .infinity)
                 .onChange(of: viewModel.messages.count) {
@@ -105,6 +110,19 @@ struct ChatView: View {
             Color.black.opacity(0.001)
                 .contentShape(Rectangle())
                 .allowsHitTesting(true)
+        )
+        .mask(
+            // Gradient mask for fade effect at bottom
+            LinearGradient(
+                gradient: Gradient(stops: [
+                    .init(color: .black, location: 0.0),
+                    .init(color: .black, location: 0.97),
+                    .init(color: .black.opacity(0.6), location: 0.99),
+                    .init(color: .clear, location: 1.0)
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
         )
     }
 }
