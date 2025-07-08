@@ -52,7 +52,7 @@ SideChat is a macOS application that provides instant access to Large Language M
 ### Chat Management
 17. The system must automatically generate titles for new chats using LLM summarization
 18. The system must allow users to manually rename chat conversations
-19. The system must provide a searchable list of all previous chats
+19. The system must provide a searchable list of all previous chats (search by chat title and last message)
 20. The system must allow users to create new chats via hotkey (default: Cmd+N) or UI button
 21. The system must allow users to switch between existing chats
 22. The system must allow users to delete entire chat conversations
@@ -137,7 +137,7 @@ SideChat is a macOS application that provides instant access to Large Language M
 ### Performance
 - Sidebar activation must feel instantaneous (< 100ms)
 - LLM streaming should update UI smoothly without lag
-- Search functionality should return results in real-time
+- Search functionality should return results in real-time using simple LIKE queries
 - Database queries should be optimized for large chat histories
 
 ### Security
@@ -153,7 +153,7 @@ SideChat is a macOS application that provides instant access to Large Language M
 4. **User Satisfaction**: 4.5+ star rating on Mac App Store
 5. **Performance**: Less than 50MB memory usage when idle
 6. **Reliability**: Less than 0.1% crash rate
-7. **Search Performance**: Return search results within 200ms for databases with 10,000+ messages
+7. **Search Performance**: Return search results within 200ms for databases with 10,000+ messages using LIKE queries on chat titles and last messages
 
 ## Open Questions
 

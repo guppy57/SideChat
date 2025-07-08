@@ -351,7 +351,7 @@ extension DatabaseMigrator {
             }
         }
         
-        // Drop old FTS tables (they will be recreated by FTSManager)
+        // Drop old FTS tables (no longer needed)
         do {
             try db.execute("DROP TABLE IF EXISTS chats_fts")
             try db.execute("DROP TABLE IF EXISTS messages_fts")

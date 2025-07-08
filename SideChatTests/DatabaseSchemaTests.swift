@@ -73,16 +73,16 @@ final class DatabaseSchemaTests: XCTestCase {
         // Create all tables
         try DatabaseSchema.createTables(db: testConnection)
         
-        // Verify FTS tables exist
+        // FTS tables removed - verify they don't exist
         let chatsFTSExists = try testConnection.scalar(
             "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='chats_fts'"
         ) as! Int64 > 0
-        XCTAssertTrue(chatsFTSExists, "Chats FTS table should exist")
+        XCTAssertFalse(chatsFTSExists, "Chats FTS table should not exist")
         
         let messagesFTSExists = try testConnection.scalar(
             "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='messages_fts'"
         ) as! Int64 > 0
-        XCTAssertTrue(messagesFTSExists, "Messages FTS table should exist")
+        XCTAssertFalse(messagesFTSExists, "Messages FTS table should not exist")
     }
     
     func testCreateIndexes() throws {
@@ -114,10 +114,7 @@ final class DatabaseSchemaTests: XCTestCase {
         // Verify triggers exist
         let triggers = [
             "update_chat_stats_insert",
-            "update_chat_stats_delete",
-            "update_chats_fts_insert",
-            "update_chats_fts_update",
-            "update_chats_fts_delete"
+            "update_chat_stats_delete"
         ]
         
         for triggerName in triggers {
@@ -218,7 +215,7 @@ final class DatabaseSchemaTests: XCTestCase {
             isArchived: false
         )
         
-        XCTAssertTrue(chatSearchQuery.contains("chats_fts MATCH"), "Should include FTS search")
+        XCTAssertTrue(chatSearchQuery.contains("LIKE '%test%'"), "Should include LIKE search")
         XCTAssertTrue(chatSearchQuery.contains("llm_provider = 'openai'"), "Should filter by provider")
         XCTAssertTrue(chatSearchQuery.contains("is_archived = 0"), "Should filter by archived status")
         XCTAssertTrue(chatSearchQuery.contains("ORDER BY chats.updated_at DESC"), "Should order by updated_at")
@@ -230,7 +227,7 @@ final class DatabaseSchemaTests: XCTestCase {
             isUser: true
         )
         
-        XCTAssertTrue(messageSearchQuery.contains("messages_fts MATCH"), "Should include FTS search")
+        XCTAssertTrue(messageSearchQuery.contains("LIKE '%hello%'"), "Should include LIKE search")
         XCTAssertTrue(messageSearchQuery.contains("chat_id ="), "Should filter by chat_id")
         XCTAssertTrue(messageSearchQuery.contains("is_user = 1"), "Should filter by user status")
         XCTAssertTrue(messageSearchQuery.contains("ORDER BY messages.timestamp DESC"), "Should order by timestamp")
@@ -317,9 +314,9 @@ final class DatabaseSchemaTests: XCTestCase {
         XCTAssertLessThan(queryTime, 0.1, "Query should complete in under 100ms")
     }
     
-    // MARK: - FTS Tests
+    // MARK: - Search Tests
     
-    func testFullTextSearch() throws {
+    func testLikeSearch() throws {
         // Create tables
         try DatabaseSchema.createTables(db: testConnection)
         
@@ -337,15 +334,9 @@ final class DatabaseSchemaTests: XCTestCase {
             DatabaseSchema.Tables.chatLastMessagePreview <- "Let's talk about neural networks"
         ))
         
-        // Trigger FTS insertion
-        try testConnection.run(
-            "INSERT INTO chats_fts(rowid, title, last_message_preview) VALUES (?, ?, ?)",
-            1, "Machine Learning Discussion", "Let's talk about neural networks"
-        )
-        
-        // Test FTS search
+        // Test LIKE search
         let searchResults = try testConnection.prepare(
-            "SELECT * FROM chats WHERE chats.rowid IN (SELECT rowid FROM chats_fts WHERE chats_fts MATCH 'machine*')"
+            "SELECT * FROM chats WHERE title LIKE '%Machine%' OR last_message_preview LIKE '%Machine%'"
         )
         
         var resultCount = 0
@@ -353,7 +344,7 @@ final class DatabaseSchemaTests: XCTestCase {
             resultCount += 1
         }
         
-        XCTAssertEqual(resultCount, 1, "Should find 1 result for 'machine' search")
+        XCTAssertEqual(resultCount, 1, "Should find 1 result for 'Machine' search")
     }
     
     // MARK: - Helper Methods
@@ -373,7 +364,7 @@ final class DatabaseSchemaTests: XCTestCase {
     // MARK: - Schema Version Tests
     
     func testSchemaVersion() {
-        XCTAssertEqual(DatabaseSchema.currentVersion, 1, "Current schema version should be 1")
+        XCTAssertEqual(DatabaseSchema.currentVersion, 2, "Current schema version should be 2")
     }
     
     func testTableDefinitions() {

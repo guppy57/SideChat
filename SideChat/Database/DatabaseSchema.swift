@@ -103,8 +103,11 @@ struct DatabaseSchema {
         // Create indexes
         try createIndexes(db: db)
         
-        // FTS is now handled by FTSManager - no longer created here
-        // Triggers removed to prevent database corruption issues
+        // Create triggers
+        try createTriggers(db: db)
+        
+        // Search is handled using LIKE queries
+        // FTS removed to prevent database corruption issues
     }
     
     private static func createChatsTable(db: Connection) throws {
@@ -161,27 +164,6 @@ struct DatabaseSchema {
             t.column(Tables.statResponseTime, defaultValue: 0.0)
             t.foreignKey(Tables.statChatId, references: Tables.chats, Tables.chatId, delete: .cascade)
         })
-    }
-    
-    private static func createFullTextSearchTables(db: Connection) throws {
-        // Create FTS table for chats using raw SQL for better control
-        try db.execute("""
-            CREATE VIRTUAL TABLE IF NOT EXISTS chats_fts USING fts5(
-                title,
-                last_message_preview,
-                content='chats',
-                content_rowid='rowid'
-            )
-        """)
-        
-        // Create FTS table for messages using raw SQL
-        try db.execute("""
-            CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
-                content,
-                content='messages',
-                content_rowid='rowid'
-            )
-        """)
     }
     
     private static func createIndexes(db: Connection) throws {
@@ -242,10 +224,6 @@ struct DatabaseSchema {
                         ELSE NEW.content
                     END
                 WHERE id = NEW.chat_id;
-                
-                -- Insert FTS record
-                INSERT INTO messages_fts(rowid, content) 
-                VALUES (NEW.rowid, NEW.content);
             END;
         """)
         
@@ -273,38 +251,6 @@ struct DatabaseSchema {
                     LIMIT 1
                 )
                 WHERE id = OLD.chat_id;
-                
-                -- Delete FTS record
-                DELETE FROM messages_fts WHERE rowid = OLD.rowid;
-            END;
-        """)
-        
-        // Trigger to maintain FTS index for chats
-        try db.execute("""
-            CREATE TRIGGER IF NOT EXISTS update_chats_fts_insert
-            AFTER INSERT ON chats
-            BEGIN
-                INSERT INTO chats_fts(rowid, title, last_message_preview) 
-                VALUES (NEW.rowid, NEW.title, NEW.last_message_preview);
-            END;
-        """)
-        
-        try db.execute("""
-            CREATE TRIGGER IF NOT EXISTS update_chats_fts_update
-            AFTER UPDATE ON chats
-            BEGIN
-                UPDATE chats_fts 
-                SET title = NEW.title, 
-                    last_message_preview = NEW.last_message_preview
-                WHERE rowid = NEW.rowid;
-            END;
-        """)
-        
-        try db.execute("""
-            CREATE TRIGGER IF NOT EXISTS update_chats_fts_delete
-            AFTER DELETE ON chats
-            BEGIN
-                DELETE FROM chats_fts WHERE rowid = OLD.rowid;
             END;
         """)
     }
@@ -392,9 +338,9 @@ struct SearchQueryBuilder {
     ) -> String {
         var conditions: [String] = []
         
-        // Full-text search condition
+        // Search condition using LIKE
         if !searchTerm.isEmpty {
-            conditions.append("chats.id IN (SELECT rowid FROM chats_fts WHERE chats_fts MATCH '\(searchTerm)*')")
+            conditions.append("(chats.title LIKE '%\(searchTerm)%' OR chats.last_message_preview LIKE '%\(searchTerm)%')")
         }
         
         // Provider filter
@@ -424,9 +370,9 @@ struct SearchQueryBuilder {
     ) -> String {
         var conditions: [String] = []
         
-        // Full-text search condition
+        // Search condition using LIKE
         if !searchTerm.isEmpty {
-            conditions.append("messages.id IN (SELECT rowid FROM messages_fts WHERE messages_fts MATCH '\(searchTerm)*')")
+            conditions.append("messages.content LIKE '%\(searchTerm)%'")
         }
         
         // Chat filter

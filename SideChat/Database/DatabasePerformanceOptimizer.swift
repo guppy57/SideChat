@@ -464,10 +464,6 @@ class DatabasePerformanceOptimizer {
                 WHERE chat_id NOT IN (SELECT id FROM chats)
             """)
             
-            // Rebuild FTS tables
-            try db.execute("INSERT INTO chats_fts(chats_fts) VALUES('rebuild')")
-            try db.execute("INSERT INTO messages_fts(messages_fts) VALUES('rebuild')")
-            
             // Update chat statistics
             try db.execute("""
                 UPDATE chats SET message_count = (

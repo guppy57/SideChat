@@ -7,18 +7,37 @@ import Foundation
 @Suite("ChatViewModel Tests")
 struct ChatViewModelTests {
     
+    // MARK: - Test Database Setup
+    
+    private func createTestDatabaseManager() async -> DatabaseManager {
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_chatvm_\(UUID().uuidString).db")
+        let testPath = tempURL.path
+        
+        // Remove existing test database if it exists
+        if FileManager.default.fileExists(atPath: testPath) {
+            try? FileManager.default.removeItem(atPath: testPath)
+        }
+        
+        let databaseManager = await DatabaseManager.forTesting(databasePath: testPath)
+        await databaseManager.initialize()
+        
+        return databaseManager
+    }
+    
     // MARK: - Initialization Tests
     
     @Test("ChatViewModel initializes with correct default values")
     @MainActor
     func testInitialization() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
-        // Wait for initial load
-        try? await Task.sleep(nanoseconds: 100_000_000)
+        // Explicitly load messages since auto-loading is disabled in tests
+        await viewModel.loadMessages()
         
         #expect(viewModel.chatId != UUID())
-        #expect(viewModel.messages.isEmpty == false) // Has mock messages
+        #expect(viewModel.messages.isEmpty == true) // No messages in test database
         #expect(viewModel.isTyping == false)
         #expect(viewModel.currentStreamingMessage == nil)
         #expect(viewModel.error == nil)
@@ -27,9 +46,10 @@ struct ChatViewModelTests {
     
     @Test("ChatViewModel initializes with provided chat ID")
     @MainActor
-    func testInitializationWithChatId() {
+    func testInitializationWithChatId() async {
+        let databaseManager = await createTestDatabaseManager()
         let chatId = UUID()
-        let viewModel = ChatViewModel(chatId: chatId)
+        let viewModel = ChatViewModel(chatId: chatId, databaseManager: databaseManager)
         
         #expect(viewModel.chatId == chatId)
     }
@@ -39,7 +59,8 @@ struct ChatViewModelTests {
     @Test("Send message creates user message")
     @MainActor
     func testSendMessageCreatesUserMessage() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         let initialCount = viewModel.messages.count
         
         viewModel.sendMessage(content: "Test message")
@@ -66,8 +87,9 @@ struct ChatViewModelTests {
     
     @Test("Send empty message does nothing")
     @MainActor
-    func testSendEmptyMessage() {
-        let viewModel = ChatViewModel()
+    func testSendEmptyMessage() async {
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         let initialCount = viewModel.messages.count
         
         viewModel.sendMessage(content: "   ")
@@ -78,7 +100,8 @@ struct ChatViewModelTests {
     @Test("Send message with images")
     @MainActor
     func testSendMessageWithImages() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         let imageData = Data([0x89, 0x50, 0x4E, 0x47]) // PNG header
         
         viewModel.sendMessage(content: "Check this image", images: [imageData])
@@ -98,7 +121,8 @@ struct ChatViewModelTests {
     @Test("Typing indicator shows during response")
     @MainActor
     func testTypingIndicator() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
         #expect(viewModel.isTyping == false)
         
@@ -120,12 +144,17 @@ struct ChatViewModelTests {
     @Test("Update message content")
     @MainActor
     func testUpdateMessageContent() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
-        // Wait for initial load
+        // Explicitly load messages
+        await viewModel.loadMessages()
+        
+        // First, create a message to update
+        viewModel.sendMessage(content: "Original message")
         try? await Task.sleep(nanoseconds: 100_000_000)
         
-        guard let firstMessage = viewModel.messages.first else {
+        guard let firstMessage = viewModel.messages.first(where: { $0.isUser }) else {
             Issue.record("No messages to test")
             return
         }
@@ -145,12 +174,17 @@ struct ChatViewModelTests {
     @Test("Delete message removes from array")
     @MainActor
     func testDeleteMessage() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
-        // Wait for initial load
+        // Explicitly load messages
+        await viewModel.loadMessages()
+        
+        // First, create a message to delete
+        viewModel.sendMessage(content: "Message to delete")
         try? await Task.sleep(nanoseconds: 100_000_000)
         
-        guard let messageToDelete = viewModel.messages.first else {
+        guard let messageToDelete = viewModel.messages.first(where: { $0.isUser }) else {
             Issue.record("No messages to test")
             return
         }
@@ -167,22 +201,29 @@ struct ChatViewModelTests {
     @Test("Computed properties work correctly")
     @MainActor
     func testComputedProperties() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
-        // Wait for initial load
+        // Explicitly load messages
+        await viewModel.loadMessages()
+        
+        // Test database starts empty
+        #expect(viewModel.hasMessages == false)
+        #expect(viewModel.lastMessage == nil)
+        
+        // Send a message to have some data
+        viewModel.sendMessage(content: "Test message")
         try? await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.hasMessages == true)
         #expect(viewModel.lastMessage != nil)
-        
-        // Test with fresh view model that might have no messages
-        // (This test depends on mock data being loaded)
     }
     
     @Test("Is waiting for response detects user message")
     @MainActor
     func testIsWaitingForResponse() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
         // Send a message which will create a user message
         viewModel.sendMessage(content: "Test waiting")
@@ -202,7 +243,8 @@ struct ChatViewModelTests {
     @Test("Mock streaming response populates message")
     @MainActor
     func testMockStreamingResponse() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         let initialCount = viewModel.messages.count
         
         viewModel.sendMessage(content: "Test streaming")
@@ -224,7 +266,8 @@ struct ChatViewModelTests {
     @Test("Last message update timestamp changes during streaming")
     @MainActor
     func testLastMessageUpdateTimestamp() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         let initialTimestamp = viewModel.lastMessageUpdate
         
         // Wait a bit to ensure timestamps are different
@@ -254,7 +297,8 @@ struct ChatViewModelTests {
     func testRetryLastMessage() async {
         // This test would need a way to simulate failure
         // For now, we'll test that retry doesn't crash on normal messages
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
         // Send a normal message
         viewModel.sendMessage(content: "Test retry")
@@ -277,10 +321,29 @@ struct ChatViewModelTests {
 @Suite("ChatViewModel Integration Tests")
 struct ChatViewModelIntegrationTests {
     
+    // MARK: - Test Database Setup
+    
+    private func createTestDatabaseManager() async -> DatabaseManager {
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_chatvm_integration_\(UUID().uuidString).db")
+        let testPath = tempURL.path
+        
+        // Remove existing test database if it exists
+        if FileManager.default.fileExists(atPath: testPath) {
+            try? FileManager.default.removeItem(atPath: testPath)
+        }
+        
+        let databaseManager = await DatabaseManager.forTesting(databasePath: testPath)
+        await databaseManager.initialize()
+        
+        return databaseManager
+    }
+    
     @Test("Full message flow works correctly")
     @MainActor
     func testFullMessageFlow() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         let initialCount = viewModel.messages.count
         
         // Send a message
@@ -316,7 +379,7 @@ struct ChatViewModelIntegrationTests {
             
             #expect(botMsg.isUser == false)
             #expect(botMsg.content.isEmpty == false)
-            #expect(botMsg.status == .sent)
+            #expect(botMsg.status == MessageStatus.sent)
         }
     }
 }
@@ -326,10 +389,29 @@ struct ChatViewModelIntegrationTests {
 @Suite("ChatViewModel Performance Tests")
 struct ChatViewModelPerformanceTests {
     
+    // MARK: - Test Database Setup
+    
+    private func createTestDatabaseManager() async -> DatabaseManager {
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_chatvm_perf_\(UUID().uuidString).db")
+        let testPath = tempURL.path
+        
+        // Remove existing test database if it exists
+        if FileManager.default.fileExists(atPath: testPath) {
+            try? FileManager.default.removeItem(atPath: testPath)
+        }
+        
+        let databaseManager = await DatabaseManager.forTesting(databasePath: testPath)
+        await databaseManager.initialize()
+        
+        return databaseManager
+    }
+    
     @Test("Handle large message history efficiently")
     @MainActor
     func testLargeMessageHistory() async {
-        let viewModel = ChatViewModel()
+        let databaseManager = await createTestDatabaseManager()
+        let viewModel = ChatViewModel(databaseManager: databaseManager)
         
         // Test operations with existing mock data
         let start = Date()

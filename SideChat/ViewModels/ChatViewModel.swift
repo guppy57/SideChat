@@ -36,9 +36,9 @@ class ChatViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(chatId: UUID? = nil, useMockService: Bool = true) {
+    init(chatId: UUID? = nil, databaseManager: DatabaseManager? = nil, useMockService: Bool = true, autoLoadMessages: Bool = true) {
         self.chatId = chatId ?? UUID()
-        self.databaseManager = DatabaseManager.shared
+        self.databaseManager = databaseManager ?? DatabaseManager.shared
         
         // Initialize mock service for development
         // TODO: Replace with real service initialization based on settings
@@ -46,9 +46,13 @@ class ChatViewModel: ObservableObject {
             self.llmService = MockLLMService(provider: defaultProvider)
         }
         
-        // Load messages on init
-        Task {
-            await loadMessages()
+        // Load messages on init only if not in test environment and autoLoadMessages is true
+        // This prevents crashes when DatabaseManager.shared isn't initialized during tests
+        let isTestEnvironment = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        if autoLoadMessages && !isTestEnvironment {
+            Task {
+                await loadMessages()
+            }
         }
     }
     

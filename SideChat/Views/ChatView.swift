@@ -141,7 +141,10 @@ struct ChatView: View {
 #if DEBUG
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView(viewModel: ChatViewModel())
+        // Create a preview-safe ChatViewModel that won't access the database
+        let viewModel = ChatViewModel(autoLoadMessages: false)
+        
+        return ChatView(viewModel: viewModel)
             .frame(width: 550, height: 600)
             .background(Color.gray.opacity(0.1))
     }

@@ -14,7 +14,6 @@ class DatabaseManager: ObservableObject {
     private var db: Connection?
     private let databasePath: String
     private var isInitialized = false
-    private var ftsManager: FTSManager?
     
     // MARK: - Test Support
     
@@ -161,17 +160,6 @@ class DatabaseManager: ObservableObject {
                 }
             }
             
-            // Initialize FTS Manager
-            if let db = db {
-                ftsManager = FTSManager(database: db)
-                do {
-                    try await ftsManager?.setupFTSTables()
-                    print("FTS Manager initialized successfully")
-                } catch {
-                    print("FTS setup failed, will use LIKE queries as fallback: \(error)")
-                    // Continue without FTS - fallback to LIKE queries will be used
-                }
-            }
             
             print("Database initialized at: \(databasePath)")
             
@@ -195,9 +183,21 @@ class DatabaseManager: ObservableObject {
         print("Database tables created successfully")
     }
     
+    // MARK: - Helper Methods
+    
+    private func ensureInitialized() throws {
+        guard isInitialized else {
+            throw DatabaseError.notInitialized
+        }
+        guard db != nil else {
+            throw DatabaseError.connectionFailed
+        }
+    }
+    
     // MARK: - Chat Operations
     
     func saveChat(_ chat: Chat) async throws {
+        try ensureInitialized()
         guard let db = db else { throw DatabaseError.connectionFailed }
         
         let insert = chats.insert(or: .replace,
@@ -213,16 +213,10 @@ class DatabaseManager: ObservableObject {
         )
         
         try db.run(insert)
-        
-        // Sync with FTS
-        try? await ftsManager?.syncChat(
-            chatId: chat.id.uuidString,
-            title: chat.title,
-            lastMessagePreview: chat.lastMessagePreview
-        )
     }
     
     func loadChat(id: UUID) async throws -> Chat? {
+        try ensureInitialized()
         guard let db = db else { throw DatabaseError.connectionFailed }
         
         let query = chats.filter(chatId == id.uuidString).limit(1)
@@ -245,6 +239,7 @@ class DatabaseManager: ObservableObject {
     }
     
     func loadAllChats() async throws -> [Chat] {
+        try ensureInitialized()
         guard let db = db else { throw DatabaseError.connectionFailed }
         
         // Check if chats table exists
@@ -304,9 +299,6 @@ class DatabaseManager: ObservableObject {
     func deleteChat(id: UUID) async throws {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
-        // Remove from FTS first
-        try? await ftsManager?.removeChat(chatId: id.uuidString)
-        
         let chatToDelete = chats.filter(chatId == id.uuidString)
         try db.run(chatToDelete.delete())
     }
@@ -346,19 +338,7 @@ class DatabaseManager: ObservableObject {
     func searchChats(query: String) async throws -> [Chat] {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
-        // Try FTS search first if available
-        if let ftsManager = ftsManager {
-            do {
-                let chatIds = try await ftsManager.searchChats(query: query)
-                if !chatIds.isEmpty {
-                    return try await loadChats(byIds: chatIds)
-                }
-            } catch {
-                print("FTS search failed, falling back to LIKE query: \(error)")
-            }
-        }
-        
-        // Fallback to LIKE query
+        // Use LIKE query for search
         var chatList: [Chat] = []
         let searchQuery = chats.filter(chatTitle.like("%\(query)%") || 
                                      chatLastMessagePreview.like("%\(query)%"))
@@ -405,8 +385,7 @@ class DatabaseManager: ObservableObject {
     ) async throws -> [Chat] {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
-        // For now, use regular search and add provider/archive filtering
-        // Full-text search can be enhanced later with proper FTS integration
+        // Use regular search and add provider/archive filtering
         var results = try await searchChats(query: query)
         
         // Apply additional filters
@@ -435,8 +414,7 @@ class DatabaseManager: ObservableObject {
     ) async throws -> [Message] {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
-        // For now, use regular search and add filtering
-        // Full-text search can be enhanced later with proper FTS integration
+        // Use regular search and add filtering
         var results = try await searchMessages(query: query, in: chatId)
         
         // Apply additional filters
@@ -608,12 +586,6 @@ class DatabaseManager: ObservableObject {
             try db.run(insert)
         }
         
-        // Sync with FTS
-        try? await ftsManager?.syncMessage(
-            messageId: message.id.uuidString,
-            content: message.content
-        )
-        
         // Update chat's message count and last message preview
         await updateChatStats(chatId: message.chatId)
     }
@@ -651,6 +623,7 @@ class DatabaseManager: ObservableObject {
     }
     
     func loadMessages(for chatId: UUID) async throws -> [Message] {
+        try ensureInitialized()
         guard let db = db else { throw DatabaseError.connectionFailed }
         
         var messageList: [Message] = []
@@ -703,9 +676,6 @@ class DatabaseManager: ObservableObject {
             chatIdToUpdate = UUID(uuidString: row[messageChatId])
         }
         
-        // Remove from FTS first
-        try? await ftsManager?.removeMessage(messageId: id.uuidString)
-        
         // Delete the message
         let messageToDelete = messages.filter(messageId == id.uuidString)
         try db.run(messageToDelete.delete())
@@ -719,22 +689,7 @@ class DatabaseManager: ObservableObject {
     func searchMessages(query: String, in chatId: UUID? = nil) async throws -> [Message] {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
-        // Try FTS search first if available
-        if let ftsManager = ftsManager {
-            do {
-                let messageIds = try await ftsManager.searchMessages(
-                    query: query,
-                    chatId: chatId?.uuidString
-                )
-                if !messageIds.isEmpty {
-                    return try await loadMessages(byIds: messageIds)
-                }
-            } catch {
-                print("FTS search failed, falling back to LIKE query: \(error)")
-            }
-        }
-        
-        // Fallback to LIKE query
+        // Use LIKE query for search
         var messageList: [Message] = []
         var searchQuery = messages.filter(messageContent.like("%\(query)%"))
         
@@ -896,7 +851,7 @@ class DatabaseManager: ObservableObject {
                     lastMessagePreview = String(content.prefix(100))
                 }
                 
-                // Get chat title for FTS sync
+                // Get chat title
                 var chatTitle = ""
                 let chatQuery = chats.filter(self.chatId == chatId.uuidString).limit(1)
                 for row in try db.prepare(chatQuery) {
@@ -910,15 +865,6 @@ class DatabaseManager: ObservableObject {
                     chatLastMessagePreview <- lastMessagePreview,
                     chatUpdatedAt <- Date()
                 ))
-                
-                // Sync with FTS after the transaction
-                Task {
-                    try? await self.ftsManager?.syncChat(
-                        chatId: chatId.uuidString,
-                        title: chatTitle,
-                        lastMessagePreview: lastMessagePreview
-                    )
-                }
             }
         } catch {
             print("Error updating chat stats: \(error)")
@@ -1027,7 +973,7 @@ class DatabaseManager: ObservableObject {
         var tableSizes: [String: Int64] = [:]
         
         // Get page counts for each table
-        let tables = ["chats", "messages", "chats_fts", "messages_fts", "settings", "chat_stats"]
+        let tables = ["chats", "messages", "settings", "chat_stats"]
         
         for tableName in tables {
             do {
@@ -1328,6 +1274,7 @@ enum DatabaseError: Error, LocalizedError {
     case queryFailed
     case deleteFailed
     case migrationFailed
+    case notInitialized
     
     var errorDescription: String? {
         switch self {
@@ -1343,6 +1290,8 @@ enum DatabaseError: Error, LocalizedError {
             return "Failed to delete data"
         case .migrationFailed:
             return "Failed to migrate database"
+        case .notInitialized:
+            return "Database manager not initialized. Call DatabaseManager.shared.initialize() before use."
         }
     }
 }
