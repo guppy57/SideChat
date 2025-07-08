@@ -7,6 +7,7 @@ import AppKit
 struct BubbleBlurView: NSViewRepresentable {
     let isUser: Bool
     let colorTheme: ColorTheme
+    @Environment(\.colorScheme) var colorScheme
     
     func makeNSView(context: Context) -> NSView {
         let containerView = NSView()
@@ -14,7 +15,11 @@ struct BubbleBlurView: NSViewRepresentable {
         
         // Create the visual effect view
         let effectView = NSVisualEffectView()
-        effectView.material = isUser ? .titlebar : .menu
+        if isUser {
+            effectView.material = .underWindowBackground
+        } else {
+            effectView.material = colorScheme == .dark ? .menu : .popover
+        }
         effectView.blendingMode = .behindWindow
         effectView.state = .active
         effectView.wantsLayer = true
@@ -35,15 +40,29 @@ struct BubbleBlurView: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {
         guard let effectView = nsView.subviews.first as? NSVisualEffectView else { return }
         
-        // Update material based on user type
-        effectView.material = isUser ? .titlebar : .menu
-        
-        // Apply color tint for user messages
+        // Update material based on user type and theme
         if isUser {
-            let tintColor = colorTheme.nsColor.withAlphaComponent(0.6)
+            effectView.material = .underWindowBackground
+        } else {
+            // Theme-aware material for bot messages
+            effectView.material = colorScheme == .dark ? .menu : .popover
+        }
+        
+        // Apply color tint for messages
+        if isUser {
+            let tintColor = colorTheme.nsColor.withAlphaComponent(0.9)
             effectView.layer?.backgroundColor = tintColor.cgColor
         } else {
-            effectView.layer?.backgroundColor = nil
+            // Theme-aware tint for bot messages
+            if colorScheme == .dark {
+                // Dark mode: grey tint (reverting to previous)
+                let greyTint = NSColor.systemGray.withAlphaComponent(0.3)
+                effectView.layer?.backgroundColor = greyTint.cgColor
+            } else {
+                // Light mode: stronger grey for vibrancy
+                let greyTint = NSColor.systemGray.withAlphaComponent(0.5)
+                effectView.layer?.backgroundColor = greyTint.cgColor
+            }
         }
     }
 }
@@ -54,6 +73,7 @@ struct BubbleBlurView: NSViewRepresentable {
 struct BubbleBackground: View {
     let isUser: Bool
     let colorTheme: ColorTheme
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack {
@@ -61,24 +81,110 @@ struct BubbleBackground: View {
             BubbleBlurView(isUser: isUser, colorTheme: colorTheme)
                 .clipShape(BubbleShape(isFromUser: isUser))
             
-            // Color overlay for user messages
+            // Color overlay for messages
             if isUser {
-                // Saturated color layer
+                // Base saturated color layer
                 BubbleShape(isFromUser: isUser)
-                    .fill(colorTheme.color.opacity(0.4))
+                    .fill(colorTheme.color.opacity(0.7))
+                
+                // Second color layer for extra saturation
+                BubbleShape(isFromUser: isUser)
+                    .fill(colorTheme.color.opacity(0.5))
+                    .blendMode(.multiply)
                 
                 // Gradient overlay for depth and vibrancy
                 BubbleShape(isFromUser: isUser)
                     .fill(
                         LinearGradient(
                             colors: [
-                                colorTheme.color.opacity(0.3),
-                                colorTheme.color.opacity(0.1)
+                                colorTheme.color.opacity(0.6),
+                                colorTheme.color.opacity(0.2)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
+                    .blendMode(.screen)
+                
+                // Top highlight for extra brightness
+                BubbleShape(isFromUser: isUser)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.3),
+                                Color.clear
+                            ],
+                            startPoint: .top,
+                            endPoint: .center
+                        )
+                    )
+            } else {
+                // Bot messages - theme-aware enhancement
+                if colorScheme == .dark {
+                    // Dark mode: grey overlays (reverting to previous appearance)
+                    
+                    // Grey base overlay
+                    BubbleShape(isFromUser: isUser)
+                        .fill(Color.gray.opacity(0.15))
+                    
+                    // Subtle gradient for depth
+                    BubbleShape(isFromUser: isUser)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.gray.opacity(0.1),
+                                    Color.clear
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    
+                    // Soft highlight
+                    BubbleShape(isFromUser: isUser)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.1),
+                                    Color.clear
+                                ],
+                                startPoint: .top,
+                                endPoint: .center
+                            )
+                        )
+                } else {
+                    // Light mode: white overlays with increased opacity for vibrancy
+                    
+                    // White base overlay with higher opacity
+                    BubbleShape(isFromUser: isUser)
+                        .fill(Color.white.opacity(0.5))
+                    
+                    // Light gradient for subtle depth
+                    BubbleShape(isFromUser: isUser)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.3),
+                                    Color.white.opacity(0.1)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    
+                    // Bright highlight
+                    BubbleShape(isFromUser: isUser)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.35),
+                                    Color.clear
+                                ],
+                                startPoint: .top,
+                                endPoint: .center
+                            )
+                        )
+                }
             }
         }
     }

@@ -7,7 +7,7 @@
         "key": "New Chat",
         "location": {
           "startingColumn": 23,
-          "startingLine": 32
+          "startingLine": 47
         }
       },
       {
@@ -15,7 +15,15 @@
         "key": "Chat History",
         "location": {
           "startingColumn": 23,
-          "startingLine": 40
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "Attach Image",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 65
         }
       },
       {
@@ -23,7 +31,7 @@
         "key": "Type a message...",
         "location": {
           "startingColumn": 27,
-          "startingLine": 47
+          "startingLine": 73
         }
       },
       {
@@ -31,7 +39,7 @@
         "key": "Unpin Sidebar",
         "location": {
           "startingColumn": 72,
-          "startingLine": 62
+          "startingLine": 88
         }
       },
       {
@@ -39,7 +47,7 @@
         "key": "Pin Sidebar",
         "location": {
           "startingColumn": 90,
-          "startingLine": 62
+          "startingLine": 88
         }
       },
       {
@@ -47,7 +55,7 @@
         "key": "Settings",
         "location": {
           "startingColumn": 23,
-          "startingLine": 70
+          "startingLine": 96
         }
       },
       {
@@ -55,7 +63,15 @@
         "key": "Send Message",
         "location": {
           "startingColumn": 23,
-          "startingLine": 83
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Drop image here",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 151
         }
       }
     ]

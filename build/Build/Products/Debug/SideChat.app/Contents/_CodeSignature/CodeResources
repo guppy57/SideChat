@@ -158,7 +158,7 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			jorPZRwRjcUIvu7gNvkWLjBHzig=
+			y/lKw3L26wbj0JZ84DwkTme7m70=
 			</data>
 			<key>requirement</key>
 			<string>identifier "SideChat.debug" and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: armaan@kreativeusa.com (H74CFD8RH6)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>

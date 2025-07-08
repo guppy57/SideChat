@@ -185,6 +185,36 @@
     "swift-dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SettingsValidator.swiftdeps",
     "swiftmodule" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SettingsValidator~partial.swiftmodule"
   },
+  "/Users/guppy57/GitHub/SideChat/SideChat/Views/BubbleBlurView.swift" : {
+    "const-values" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView.swiftconstvalues",
+    "dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView.d",
+    "diagnostics" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView.dia",
+    "index-unit-output-path" : "/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView.o",
+    "llvm-bc" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView.bc",
+    "object" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView.o",
+    "swift-dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView.swiftdeps",
+    "swiftmodule" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/BubbleBlurView~partial.swiftmodule"
+  },
+  "/Users/guppy57/GitHub/SideChat/SideChat/Views/ChatBubbleView.swift" : {
+    "const-values" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView.swiftconstvalues",
+    "dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView.d",
+    "diagnostics" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView.dia",
+    "index-unit-output-path" : "/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView.o",
+    "llvm-bc" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView.bc",
+    "object" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView.o",
+    "swift-dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView.swiftdeps",
+    "swiftmodule" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatBubbleView~partial.swiftmodule"
+  },
+  "/Users/guppy57/GitHub/SideChat/SideChat/Views/ChatView.swift" : {
+    "const-values" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView.swiftconstvalues",
+    "dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView.d",
+    "diagnostics" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView.dia",
+    "index-unit-output-path" : "/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView.o",
+    "llvm-bc" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView.bc",
+    "object" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView.o",
+    "swift-dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView.swiftdeps",
+    "swiftmodule" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatView~partial.swiftmodule"
+  },
   "/Users/guppy57/GitHub/SideChat/SideChat/Views/EdgeTabView.swift" : {
     "const-values" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/EdgeTabView.swiftconstvalues",
     "dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/EdgeTabView.d",
@@ -204,6 +234,26 @@
     "object" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar.o",
     "swift-dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar.swiftdeps",
     "swiftmodule" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar~partial.swiftmodule"
+  },
+  "/Users/guppy57/GitHub/SideChat/SideChat/Views/ImagePickerView.swift" : {
+    "const-values" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView.swiftconstvalues",
+    "dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView.d",
+    "diagnostics" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView.dia",
+    "index-unit-output-path" : "/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView.o",
+    "llvm-bc" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView.bc",
+    "object" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView.o",
+    "swift-dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView.swiftdeps",
+    "swiftmodule" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePickerView~partial.swiftmodule"
+  },
+  "/Users/guppy57/GitHub/SideChat/SideChat/Views/ImagePreviewView.swift" : {
+    "const-values" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView.swiftconstvalues",
+    "dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView.d",
+    "diagnostics" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView.dia",
+    "index-unit-output-path" : "/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView.o",
+    "llvm-bc" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView.bc",
+    "object" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView.o",
+    "swift-dependencies" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView.swiftdeps",
+    "swiftmodule" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ImagePreviewView~partial.swiftmodule"
   },
   "/Users/guppy57/GitHub/SideChat/SideChat/Views/SidebarView.swift" : {
     "const-values" : "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SidebarView.swiftconstvalues",
