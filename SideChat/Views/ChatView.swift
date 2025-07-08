@@ -61,15 +61,15 @@ struct ChatView: View {
                 .onChange(of: viewModel.throttledScrollUpdate) {
                     // Auto-scroll during streaming if user isn't manually scrolling
                     if !userIsScrolling {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        // Use faster animation during streaming for more responsive scrolling
+                        let animationDuration = viewModel.currentStreamingMessage != nil ? 0.1 : 0.2
+                        
+                        withAnimation(.easeInOut(duration: animationDuration)) {
                             if viewModel.isTyping {
                                 proxy.scrollTo("typing-indicator", anchor: .bottom)
                             } else if let lastMessage = viewModel.messages.last {
-                                // Scroll with extra space for incoming text during streaming
-                                let anchor = viewModel.currentStreamingMessage != nil 
-                                    ? UnitPoint(x: 0.5, y: 1.3)  // Extra 30% padding during streaming
-                                    : .bottom
-                                proxy.scrollTo(lastMessage.id, anchor: anchor)
+                                // Always use bottom anchor for consistent scrolling
+                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
                             }
                         }
                     }

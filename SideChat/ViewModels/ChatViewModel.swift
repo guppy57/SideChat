@@ -22,7 +22,7 @@ class ChatViewModel: ObservableObject {
     
     // Scroll throttling
     private var scrollThrottleTimer: Timer?
-    private let scrollThrottleInterval = 0.1 // 100ms for more responsive scrolling
+    private let scrollThrottleInterval = 0.033 // 33ms for 30fps smooth scrolling
     
     // MARK: - Properties
     

@@ -113,16 +113,16 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 4.11 Add send button functionality and keyboard shortcuts - Connect to ChatViewModel
   - [x] 4.22 Create MockLLMService for testing streaming and responses
   - [x] 4.7 Create typing indicator for LLM responses
-  - [ ] 4.9 Add message copy functionality for individual messages
-  - [ ] 4.17 Add loading states and error handling throughout UI
-  - [ ] 4.19 Create SidebarViewModel for overall sidebar state management
+  - [x] 4.9 Add message copy functionality for individual messages
   - [ ] 4.12 Implement ChatListView with searchable chat history
+  - [ ] 4.19 Create SidebarViewModel for overall sidebar state management
   - [ ] 4.13 Add chat creation UI with LLM provider selection
   - [ ] 4.14 Implement chat renaming functionality
   - [ ] 4.15 Add chat deletion with confirmation dialog
   - [ ] 4.16 Create chat export functionality (markdown/JSON)
-  - [ ] 4.20 Create BlurredContainer component for consistent translucent backgrounds
-  - [ ] 4.21 Implement bottom-anchored chat list with reverse scroll behavior
+  - [x] 4.20 Create BlurredContainer component for consistent translucent backgrounds
+  - [x] 4.21 Implement bottom-anchored chat list with reverse scroll behavior
+  - [ ] 4.17 Add loading states and error handling throughout UI
 
 - [ ] 5.0 Integrate LLM providers and API services
   - [ ] 5.1 Create KeychainManager for secure API key storage

@@ -14,6 +14,7 @@ struct ChatBubbleView: View {
     @Default(.fontSize) private var fontSize
     @Default(.enableMarkdownRendering) private var enableMarkdownRendering
     
+    
     // MARK: - Body
     
     var body: some View {
@@ -45,13 +46,13 @@ struct ChatBubbleView: View {
                         // Text content if present
                         if !message.content.isEmpty {
                             Group {
-                                if enableMarkdownRendering && !message.isUser {
-                                    // Use markdown for bot messages
+                                if enableMarkdownRendering {
+                                    // Use markdown for all messages when enabled
                                     Markdown(message.content)
                                         .markdownTheme(markdownTheme)
                                         .font(.system(size: CGFloat(fontSize)))
                                 } else {
-                                    // Plain text for user messages or when markdown is disabled
+                                    // Plain text when markdown is disabled
                                     Text(message.content)
                                         .font(.system(size: CGFloat(fontSize)))
                                         .foregroundColor(message.isUser ? .white : .primary)
@@ -97,6 +98,17 @@ struct ChatBubbleView: View {
             }
         }
         .padding(.horizontal, 4)
+        .contextMenu {
+            Button(action: copyMessage) {
+                Label("Copy", systemImage: "doc.on.doc")
+            }
+            
+            if enableMarkdownRendering {
+                Button(action: copyAsMarkdown) {
+                    Label("Copy as Markdown", systemImage: "doc.richtext")
+                }
+            }
+        }
     }
     
     // MARK: - Computed Properties
@@ -184,6 +196,25 @@ struct ChatBubbleView: View {
         } else {
             return Color.primary.opacity(0.1)
         }
+    }
+    
+    // MARK: - Methods
+    
+    private func copyMessage() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(message.content, forType: .string)
+        
+        // Haptic feedback on supported Macs
+        NSHapticFeedbackManager.defaultPerformer.perform(
+            .alignment,
+            performanceTime: .default
+        )
+    }
+    
+    private func copyAsMarkdown() {
+        // For now, copying as markdown is the same as regular copy
+        // In the future, this could preserve formatting differently
+        copyMessage()
     }
 }
 
