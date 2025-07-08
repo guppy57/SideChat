@@ -100,7 +100,12 @@ struct ChatView: View {
             }
             
         }
-        .background(Color.clear)
+        .background(
+            // Click-blocking transparent background
+            Color.black.opacity(0.001)
+                .contentShape(Rectangle())
+                .allowsHitTesting(true)
+        )
     }
 }
 

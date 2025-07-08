@@ -147,7 +147,12 @@ struct SidebarView: View {
             .animation(.easeInOut(duration: 0.2), value: selectedImages)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.clear) // Completely transparent background
+        .background(
+            // Nearly invisible background that captures mouse events
+            Color.black.opacity(0.001)
+                .contentShape(Rectangle())
+                .allowsHitTesting(true)
+        )
         .onDrop(of: [.image, .fileURL], isTargeted: $isDragTargeted, perform: handleDrop)
         .overlay {
             if isDragTargeted && enableImageUploads {
