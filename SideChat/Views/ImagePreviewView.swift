@@ -176,13 +176,15 @@ struct InlineImagesPreview: View {
 struct WrappingHStack: Layout {
     var alignment: VerticalAlignment = .center
     var spacing: CGFloat = 8
+    var horizontalAlignment: HorizontalAlignment = .leading
     
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let result = FlowResult(
             in: proposal.replacingUnspecifiedDimensions().width,
             subviews: subviews,
             alignment: alignment,
-            spacing: spacing
+            spacing: spacing,
+            horizontalAlignment: horizontalAlignment
         )
         return result.size
     }
@@ -192,7 +194,8 @@ struct WrappingHStack: Layout {
             in: bounds.width,
             subviews: subviews,
             alignment: alignment,
-            spacing: spacing
+            spacing: spacing,
+            horizontalAlignment: horizontalAlignment
         )
         
         for (index, subview) in subviews.enumerated() {
@@ -206,46 +209,74 @@ struct WrappingHStack: Layout {
         var size: CGSize = .zero
         var positions: [CGPoint] = []
         
-        init(in maxWidth: CGFloat, subviews: Subviews, alignment: VerticalAlignment, spacing: CGFloat) {
+        init(in maxWidth: CGFloat, subviews: Subviews, alignment: VerticalAlignment, spacing: CGFloat, horizontalAlignment: HorizontalAlignment) {
             var currentX: CGFloat = 0
             var currentY: CGFloat = 0
             var lineHeight: CGFloat = 0
             var positions: [CGPoint] = []
-            var rowRanges: [(start: Int, end: Int, height: CGFloat)] = []
+            var rowRanges: [(start: Int, end: Int, height: CGFloat, width: CGFloat)] = []
             var currentRowStart = 0
+            var currentRowWidth: CGFloat = 0
             
             for (index, subview) in subviews.enumerated() {
                 let size = subview.sizeThatFits(.unspecified)
                 
-                if currentX + size.width > maxWidth && currentX > 0 {
+                // Check if we need to wrap (exclude spacing from the check)
+                let needsWrap = currentX > 0 && (currentX + size.width) > maxWidth
+                
+                if needsWrap {
                     // Save current row info
-                    rowRanges.append((start: currentRowStart, end: index - 1, height: lineHeight))
+                    rowRanges.append((start: currentRowStart, end: index - 1, height: lineHeight, width: currentRowWidth))
                     
                     // Wrap to next line
                     currentX = 0
                     currentY += lineHeight + spacing
                     lineHeight = 0
                     currentRowStart = index
+                    currentRowWidth = 0
                 }
                 
                 positions.append(CGPoint(x: currentX, y: currentY))
                 lineHeight = max(lineHeight, size.height)
-                currentX += size.width + spacing
                 
-                self.size.width = max(self.size.width, currentX - spacing)
+                // Update position for next item
+                currentX += size.width
+                
+                // Update row width (includes this item but not the trailing spacing)
+                currentRowWidth = currentX
+                
+                // Add spacing for next item (but not at the end of a row)
+                if index < subviews.count - 1 {
+                    currentX += spacing
+                }
+                
+                self.size.width = max(self.size.width, currentRowWidth)
             }
             
             // Don't forget the last row
             if currentRowStart < subviews.count {
-                rowRanges.append((start: currentRowStart, end: subviews.count - 1, height: lineHeight))
+                rowRanges.append((start: currentRowStart, end: subviews.count - 1, height: lineHeight, width: currentRowWidth))
             }
             
             self.size.height = currentY + lineHeight
             
-            // Adjust Y positions for bottom alignment within each row
-            if alignment == .bottom {
-                for row in rowRanges {
-                    for i in row.start...row.end {
+            // Adjust positions for alignment
+            for row in rowRanges {
+                // Horizontal alignment adjustment
+                var xOffset: CGFloat = 0
+                if horizontalAlignment == .center {
+                    xOffset = (maxWidth - row.width) / 2
+                } else if horizontalAlignment == .trailing {
+                    xOffset = maxWidth - row.width
+                }
+                // .leading requires no offset (xOffset = 0)
+                
+                for i in row.start...row.end {
+                    // Apply horizontal offset
+                    positions[i].x += xOffset
+                    
+                    // Vertical alignment within row
+                    if alignment == .bottom {
                         let subview = subviews[i]
                         let size = subview.sizeThatFits(.unspecified)
                         positions[i].y += row.height - size.height

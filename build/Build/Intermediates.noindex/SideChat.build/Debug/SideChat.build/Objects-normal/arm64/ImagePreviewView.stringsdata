@@ -15,7 +15,7 @@
         "key": "Add Image",
         "location": {
           "startingColumn": 22,
-          "startingLine": 303
+          "startingLine": 334
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "Compress images before sending",
         "location": {
           "startingColumn": 20,
-          "startingLine": 333
+          "startingLine": 364
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "Quality:",
         "location": {
           "startingColumn": 26,
-          "startingLine": 338
+          "startingLine": 369
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "%lld%%",
         "location": {
           "startingColumn": 26,
-          "startingLine": 344
+          "startingLine": 375
         }
       }
     ]
