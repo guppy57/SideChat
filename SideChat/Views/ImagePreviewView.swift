@@ -179,14 +179,16 @@ struct WrappingHStack: Layout {
     var horizontalAlignment: HorizontalAlignment = .leading
     
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let proposedWidth = proposal.replacingUnspecifiedDimensions().width
         let result = FlowResult(
-            in: proposal.replacingUnspecifiedDimensions().width,
+            in: proposedWidth,
             subviews: subviews,
             alignment: alignment,
             spacing: spacing,
             horizontalAlignment: horizontalAlignment
         )
-        return result.size
+        // Return the full proposed width to prevent parent container from centering
+        return CGSize(width: proposedWidth, height: result.size.height)
     }
     
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
@@ -217,6 +219,7 @@ struct WrappingHStack: Layout {
             var rowRanges: [(start: Int, end: Int, height: CGFloat, width: CGFloat)] = []
             var currentRowStart = 0
             var currentRowWidth: CGFloat = 0
+            var contentWidth: CGFloat = 0
             
             for (index, subview) in subviews.enumerated() {
                 let size = subview.sizeThatFits(.unspecified)
@@ -250,7 +253,7 @@ struct WrappingHStack: Layout {
                     currentX += spacing
                 }
                 
-                self.size.width = max(self.size.width, currentRowWidth)
+                contentWidth = max(contentWidth, currentRowWidth)
             }
             
             // Don't forget the last row
@@ -258,7 +261,8 @@ struct WrappingHStack: Layout {
                 rowRanges.append((start: currentRowStart, end: subviews.count - 1, height: lineHeight, width: currentRowWidth))
             }
             
-            self.size.height = currentY + lineHeight
+            // Set size - width will be overridden in sizeThatFits to use full available width
+            self.size = CGSize(width: contentWidth, height: currentY + lineHeight)
             
             // Adjust positions for alignment
             for row in rowRanges {
