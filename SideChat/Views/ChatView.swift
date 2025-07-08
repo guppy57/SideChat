@@ -67,7 +67,7 @@ struct ChatView: View {
                             } else if let lastMessage = viewModel.messages.last {
                                 // Scroll with extra space for incoming text during streaming
                                 let anchor = viewModel.currentStreamingMessage != nil 
-                                    ? UnitPoint(x: 0.5, y: 1.1)  // Extra 10% padding during streaming
+                                    ? UnitPoint(x: 0.5, y: 1.3)  // Extra 30% padding during streaming
                                     : .bottom
                                 proxy.scrollTo(lastMessage.id, anchor: anchor)
                             }
