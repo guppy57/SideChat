@@ -136,9 +136,10 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 4.27 Add performance optimizations (LazyVStack, pagination, conditional rendering)
   - [x] 4.13 Add chat creation UI with LLM provider selection - New chat button in toolbar
   - [x] 4.14 Implement chat renaming functionality - Context menu on chat header
-  - [ ] 4.19 Create SidebarViewModel for overall sidebar state management - Not needed with current architecture
-  - [ ] 4.15 Add chat deletion with confirmation dialog
-  - [ ] 4.28 Add chat archiving with confirmation dialog
+  - [x] 4.19 Create SidebarViewModel for overall sidebar state management - Not needed with current architecture
+  - [ ] 4.15 Add individual llm or user chat deletion without any confirmation dialog by adding new option to context menu
+  - [ ] 4.15.1 Add entire chat delete with a confirmation dialog
+  - [ ] 4.28 Add entire chat archiving with confirmation dialog
   - [ ] 4.29 Add active/archived filtering in inline chat list
   - [ ] 4.30 Implement "Load More" button for viewing older messages
   - [ ] 4.16 Create chat export functionality (markdown/JSON)

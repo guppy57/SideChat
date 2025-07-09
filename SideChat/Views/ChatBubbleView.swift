@@ -23,6 +23,23 @@ struct ChatBubbleView: View {
                 Spacer(minLength: 60)
             }
             
+            // Avatar for bot messages
+            if !message.isUser, let provider = message.metadata?.provider {
+                Circle()
+                    .fill(providerColor(for: provider).opacity(0.8))
+                    .overlay(
+                        Circle()
+                            .stroke(providerColor(for: provider), lineWidth: 0.5)
+                    )
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Image(systemName: providerIcon(for: provider))
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                    )
+                    .padding(.bottom, 2) // Align with bubble bottom
+            }
+            
             VStack(alignment: message.isUser ? .trailing : .leading, spacing: 4) {
                 // Message bubble with tail
                 ZStack(alignment: message.isUser ? .bottomTrailing : .bottomLeading) {
@@ -84,35 +101,6 @@ struct ChatBubbleView: View {
                                 .font(.system(size: 10))
                                 .foregroundColor(.red)
                         }
-                    } else if let metadata = message.metadata {
-                        // Show provider badge for bot messages
-                        HStack(spacing: 4) {
-                            if let provider = metadata.provider {
-                                Image(systemName: providerIcon(for: provider))
-                                    .font(.system(size: 11, weight: .medium))
-                                    .foregroundColor(providerColor(for: provider))
-                            }
-                            
-                            if let model = metadata.model {
-                                Text(model)
-                                    .font(.system(size: 11, weight: .medium))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(Color(NSColor.controlBackgroundColor))
-                                .overlay(
-                                    Capsule()
-                                        .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
-                                )
-                        )
-                        
-                        Text("•")
-                            .font(.system(size: 8))
-                            .foregroundColor(.secondary)
                     }
                     
                     Text(message.formattedTimestamp)
