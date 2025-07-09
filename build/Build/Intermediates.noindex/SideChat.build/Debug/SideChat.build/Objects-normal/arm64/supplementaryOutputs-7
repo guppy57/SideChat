@@ -1,0 +1,18 @@
+"/Users/guppy57/GitHub/SideChat/SideChat/Models/LLMProvider.swift":
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/LLMProvider.d"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/LLMProvider.dia"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/LLMProvider.swiftconstvalues"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/LLMProvider.swiftdeps"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/LLMProvider.o"
+"/Users/guppy57/GitHub/SideChat/SideChat/Views/SidebarView.swift":
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SidebarView.swiftconstvalues"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SidebarView.o"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SidebarView.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SidebarView.swiftdeps"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SidebarView.dia"
+"/Users/guppy57/GitHub/SideChat/SideChat/Utilities/SettingsValidator.swift":
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SettingsValidator.swiftconstvalues"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SettingsValidator.dia"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SettingsValidator.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SettingsValidator.swiftdeps"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SettingsValidator.o"

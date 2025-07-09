@@ -214,7 +214,7 @@ struct SidebarView: View {
         .background(
             Color.black.opacity(0.001)
                 .contentShape(Rectangle())
-                .allowsHitTesting(true)
+                .allowsHitTesting(false)
         )
         .onDrop(of: [.image, .fileURL], isTargeted: $isDragTargeted, perform: handleDrop)
         .overlay(

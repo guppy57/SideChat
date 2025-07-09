@@ -1,0 +1,18 @@
+"/Users/guppy57/GitHub/SideChat/SideChat/ViewModels/ChatViewModel.swift":
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatViewModel.swiftdeps"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatViewModel.swiftconstvalues"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatViewModel.o"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatViewModel.dia"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatViewModel.d"
+"/Users/guppy57/GitHub/SideChat/SideChat/Models/Message.swift":
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/Message.swiftconstvalues"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/Message.dia"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/Message.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/Message.swiftdeps"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/Message.o"
+"/Users/guppy57/GitHub/SideChat/SideChat/Views/TypingIndicatorView.swift":
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/TypingIndicatorView.swiftconstvalues"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/TypingIndicatorView.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/TypingIndicatorView.swiftdeps"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/TypingIndicatorView.dia"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/TypingIndicatorView.o"

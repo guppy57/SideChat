@@ -7,7 +7,7 @@
         "key": "Copy",
         "location": {
           "startingColumn": 23,
-          "startingLine": 103
+          "startingLine": 133
         }
       },
       {
@@ -15,7 +15,15 @@
         "key": "Copy as Markdown",
         "location": {
           "startingColumn": 27,
-          "startingLine": 108
+          "startingLine": 141
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 152
         }
       }
     ]

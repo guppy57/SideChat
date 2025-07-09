@@ -1,0 +1,24 @@
+"/Users/guppy57/GitHub/SideChat/SideChat/Views/ChatListView.swift":
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatListView.o"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatListView.swiftconstvalues"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatListView.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatListView.swiftdeps"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ChatListView.dia"
+"/Users/guppy57/GitHub/SideChat/SideChat/Services/MockLLMService.swift":
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/MockLLMService.swiftdeps"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/MockLLMService.dia"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/MockLLMService.o"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/MockLLMService.swiftconstvalues"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/MockLLMService.d"
+"/Users/guppy57/GitHub/SideChat/SideChat/ContentView.swift":
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ContentView.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ContentView.swiftdeps"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ContentView.o"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ContentView.swiftconstvalues"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/ContentView.dia"
+"/Users/guppy57/GitHub/SideChat/SideChat/Database/DatabaseSchema.swift":
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DatabaseSchema.d"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DatabaseSchema.swiftconstvalues"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DatabaseSchema.dia"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DatabaseSchema.o"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DatabaseSchema.swiftdeps"

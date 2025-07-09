@@ -1,0 +1,18 @@
+"/Users/guppy57/GitHub/SideChat/SideChat/SideChatApp.swift":
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SideChatApp.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SideChatApp.swiftdeps"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SideChatApp.swiftconstvalues"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SideChatApp.o"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/SideChatApp.dia"
+"/Users/guppy57/GitHub/SideChat/SideChat/Views/EdgeTabView.swift":
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/EdgeTabView.d"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/EdgeTabView.o"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/EdgeTabView.dia"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/EdgeTabView.swiftconstvalues"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/EdgeTabView.swiftdeps"
+"/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/DerivedSources/GeneratedAssetSymbols.swift":
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/GeneratedAssetSymbols.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/GeneratedAssetSymbols.dia"

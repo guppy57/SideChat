@@ -1,0 +1,18 @@
+"/Users/guppy57/GitHub/SideChat/SideChat/Extensions/View+Blur.swift":
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/View+Blur.dia"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/View+Blur.swiftconstvalues"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/View+Blur.o"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/View+Blur.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/View+Blur.swiftdeps"
+"/Users/guppy57/GitHub/SideChat/SideChat/Utilities/DefaultsManager.swift":
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DefaultsManager.swiftconstvalues"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DefaultsManager.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DefaultsManager.swiftdeps"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DefaultsManager.dia"
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/DefaultsManager.o"
+"/Users/guppy57/GitHub/SideChat/SideChat/Views/FloatingToolbar.swift":
+  object: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar.o"
+  dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar.d"
+  swift-dependencies: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar.swiftdeps"
+  const-values: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar.swiftconstvalues"
+  diagnostics: "/Users/guppy57/GitHub/SideChat/build/Build/Intermediates.noindex/SideChat.build/Debug/SideChat.build/Objects-normal/arm64/FloatingToolbar.dia"

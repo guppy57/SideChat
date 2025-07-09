@@ -1,0 +1,544 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Views/SettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "General",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 20
+        }
+      },
+      {
+        "comment": "",
+        "key": "API Keys",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 26
+        }
+      },
+      {
+        "comment": "",
+        "key": "Appearance",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "Keyboard",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "Advanced",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Default Provider",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sidebar",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "LLM Provider",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Position",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Auto-hide when clicking outside",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enable animations",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "Left",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 124
+        }
+      },
+      {
+        "comment": "",
+        "key": "Right",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "Theme",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "Typography",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 175
+        }
+      },
+      {
+        "comment": "",
+        "key": "Window",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 195
+        }
+      },
+      {
+        "comment": "",
+        "key": "Color Theme",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 152
+        }
+      },
+      {
+        "comment": "",
+        "key": "Appearance",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "System",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 167
+        }
+      },
+      {
+        "comment": "",
+        "key": "Light",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 168
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dark",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 169
+        }
+      },
+      {
+        "comment": "",
+        "key": "Font Family",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 185
+        }
+      },
+      {
+        "comment": "",
+        "key": "Font Size",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 177
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lldpt",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 180
+        }
+      },
+      {
+        "comment": "",
+        "key": "SF Pro Text",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "SF Mono",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "New York",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 188
+        }
+      },
+      {
+        "comment": "",
+        "key": "Helvetica Neue",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 189
+        }
+      },
+      {
+        "comment": "",
+        "key": "Transparency",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 197
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "Blur Intensity",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 209
+        }
+      },
+      {
+        "comment": "",
+        "key": "Global Shortcuts",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 228
+        }
+      },
+      {
+        "comment": "",
+        "key": "Configure keyboard shortcuts for quick access",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 230
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show/Hide Sidebar",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 236
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Chat",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 247
+        }
+      },
+      {
+        "comment": "",
+        "key": "Note: Click on a shortcut to change it",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 260
+        }
+      },
+      {
+        "comment": "",
+        "key": "Data Storage",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 280
+        }
+      },
+      {
+        "comment": "",
+        "key": "Data Retention",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 286
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store conversation history",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 281
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enable database encryption",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 282
+        }
+      },
+      {
+        "comment": "",
+        "key": "Auto-delete old chats",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 287
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete after",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "7 days",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 291
+        }
+      },
+      {
+        "comment": "",
+        "key": "30 days",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 292
+        }
+      },
+      {
+        "comment": "",
+        "key": "90 days",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 293
+        }
+      },
+      {
+        "comment": "",
+        "key": "180 days",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 294
+        }
+      },
+      {
+        "comment": "",
+        "key": "365 days",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 295
+        }
+      },
+      {
+        "comment": "",
+        "key": "This action cannot be undone",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 308
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear All Chat History...",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 303
+        }
+      },
+      {
+        "comment": "",
+        "key": "Developer Options",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 329
+        }
+      },
+      {
+        "comment": "",
+        "key": "Performance",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 334
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enable debug mode",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 330
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enable beta features",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 331
+        }
+      },
+      {
+        "comment": "",
+        "key": "Max chat history",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 344
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enable streaming responses",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 354
+        }
+      },
+      {
+        "comment": "",
+        "key": "Request timeout",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 336
+        }
+      },
+      {
+        "comment": "",
+        "key": "%llds",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 339
+        }
+      },
+      {
+        "comment": "",
+        "key": "100 chats",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 345
+        }
+      },
+      {
+        "comment": "",
+        "key": "500 chats",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 346
+        }
+      },
+      {
+        "comment": "",
+        "key": "1000 chats",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 347
+        }
+      },
+      {
+        "comment": "",
+        "key": "5000 chats",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 348
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unlimited",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset All Settings to Defaults...",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 358
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export Settings...",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 363
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import Settings...",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 367
+        }
+      }
+    ]
+  },
+  "version": 1
+}

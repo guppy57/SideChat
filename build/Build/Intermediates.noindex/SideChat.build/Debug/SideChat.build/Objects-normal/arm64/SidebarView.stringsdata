@@ -4,66 +4,42 @@
     "Localizable": [
       {
         "comment": "",
-        "key": "New Chat",
+        "key": "Chat Title",
         "location": {
-          "startingColumn": 23,
-          "startingLine": 81
+          "startingColumn": 35,
+          "startingLine": 90
         }
       },
       {
         "comment": "",
-        "key": "Chat History",
+        "key": "Rename Chat",
         "location": {
-          "startingColumn": 23,
-          "startingLine": 89
+          "startingColumn": 43,
+          "startingLine": 112
         }
       },
       {
         "comment": "",
-        "key": "Attach Image",
+        "key": "%@ (%@)",
         "location": {
-          "startingColumn": 27,
-          "startingLine": 99
+          "startingColumn": 46,
+          "startingLine": 128
         }
       },
       {
         "comment": "",
-        "key": "Type a message...",
+        "key": "No Provider",
         "location": {
-          "startingColumn": 27,
-          "startingLine": 107
+          "startingColumn": 42,
+          "startingLine": 146
         }
       },
       {
         "comment": "",
-        "key": "Unpin Sidebar",
+        "key": "No Providers",
         "location": {
-          "startingColumn": 72,
-          "startingLine": 122
-        }
-      },
-      {
-        "comment": "",
-        "key": "Pin Sidebar",
-        "location": {
-          "startingColumn": 90,
-          "startingLine": 122
-        }
-      },
-      {
-        "comment": "",
-        "key": "Settings",
-        "location": {
-          "startingColumn": 23,
-          "startingLine": 130
-        }
-      },
-      {
-        "comment": "",
-        "key": "Send Message",
-        "location": {
-          "startingColumn": 23,
-          "startingLine": 143
+          "startingColumn": 34,
+          "startingLine": 169
         }
       },
       {
@@ -71,7 +47,103 @@
         "key": "Drop image here",
         "location": {
           "startingColumn": 26,
-          "startingLine": 193
+          "startingLine": 226
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Chat",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 300
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close Chat List",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 312
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chat History",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 312
+        }
+      },
+      {
+        "comment": "",
+        "key": "Attach Image",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 321
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type a message...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 328
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unpin Sidebar",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 343
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pin Sidebar",
+        "location": {
+          "startingColumn": 90,
+          "startingLine": 343
+        }
+      },
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 351
+        }
+      },
+      {
+        "comment": "",
+        "key": "Send Message",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 363
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chat History",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 620
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search chats...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 633
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading chats...",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 709
         }
       }
     ]

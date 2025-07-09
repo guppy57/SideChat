@@ -11,7 +11,7 @@ struct ChatView: View {
     
     @ObservedObject var viewModel: ChatViewModel
     @State private var userIsScrolling = false
-    @State private var refreshID = UUID()
+    @State private var lazyVStackFrame: CGRect = .zero
     
     // MARK: - Body
     
@@ -19,61 +19,98 @@ struct ChatView: View {
         ScrollViewReader { proxy in
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
-                VStack(spacing: 0) {
-                    // Top buffer to allow scrolling content below gradient
-                    Color.clear
-                        .frame(height: 30)
-                    
-                    // Spacer to push content to bottom
-                    Spacer(minLength: 0)
-                    
-                    // Messages container with lazy loading for performance
-                    LazyVStack(spacing: 12) {
-                        ForEach(viewModel.messages) { message in
-                            ChatBubbleView(
-                                message: message,
-                                onDelete: {
-                                    // Delay to allow context menu to dismiss properly
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                        viewModel.deleteMessage(id: message.id)
-                                        // Force view refresh to reset context menu state
-                                        refreshID = UUID()
+                        
+                    VStack(spacing: 0) {
+                        // Top buffer to allow scrolling content below gradient
+                        Color.clear
+                            .frame(height: 30)
+                        
+                        // Messages container with bottom alignment
+                        VStack {
+                            Spacer(minLength: 0)
+                            
+                            GeometryReader { lazyGeo in
+                                LazyVStack(spacing: 12) {
+                                    ForEach(viewModel.messages) { message in
+                                        ChatBubbleView(
+                                            message: message,
+                                            onDelete: {
+                                                print("🗑️ DELETE initiated for message: \(message.id)")
+                                                print("  Current LazyVStack frame: \(lazyGeo.frame(in: .global))")
+                                                print("  Current LazyVStack size: \(lazyGeo.size)")
+                                                
+                                                // Delay to allow context menu to dismiss properly
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                                    viewModel.deleteMessage(id: message.id)
+                                                }
+                                            }
+                                        )
+                                        .id(message.id)
+                                        .background(
+                                            GeometryReader { bubbleGeo in
+                                                Color.clear
+                                                    .onAppear {
+                                                        let frame = bubbleGeo.frame(in: .global)
+                                                        print("🟩 Message \(message.id.uuidString.prefix(8)) frame: \(frame)")
+                                                        print("  Height: \(frame.height), isUser: \(message.isUser)")
+                                                    }
+                                            }
+                                        )
+                                    }
+                        
+                                    // Typing indicator
+                                    if viewModel.isTyping {
+                                        TypingIndicatorView()
+                                            .id("typing-indicator")
                                     }
                                 }
-                            )
-                            .id(message.id)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                                .padding(.bottom, viewModel.messages.count < 5 ? 60 : 8)
+                                .background(
+                                    GeometryReader { geo in
+                                        Color.clear
+                                            .onAppear {
+                                                lazyVStackFrame = geo.frame(in: .global)
+                                                print("🟨 LazyVStack initial frame: \(lazyVStackFrame)")
+                                            }
+                                            .onChange(of: viewModel.messages.count) { _, count in
+                                                lazyVStackFrame = geo.frame(in: .global)
+                                                print("🟨 LazyVStack frame after change (count: \(count)): \(lazyVStackFrame)")
+                                                print("  Size: \(geo.size)")
+                                                print("  Bottom padding: \(count < 5 ? 60 : 8)")
+                                            }
+                                    }
+                                )
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .contentShape(Rectangle()) // Ensure proper hit testing area for entire VStack
                         
-                        // Typing indicator
-                        if viewModel.isTyping {
-                            TypingIndicatorView()
-                                .id("typing-indicator")
-                        }
+                        // Bottom buffer to allow scrolling content above gradient
+                        Color.clear
+                            .frame(height: 30)
                     }
-                    .id(refreshID) // Force refresh when ID changes
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                    .padding(.bottom, 8)
-                    
-                    // Bottom buffer to allow scrolling content above gradient
-                    Color.clear
-                        .frame(height: 30)
-                }
-                .frame(maxWidth: .infinity)
-                .onChange(of: viewModel.messages.count) {
-                    // Auto-scroll to new messages (optimized)
-                    if !userIsScrolling && !viewModel.messages.isEmpty {
-                        // Use lighter animation for better performance
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            if viewModel.isTyping {
-                                proxy.scrollTo("typing-indicator", anchor: .bottom)
-                            } else {
-                                proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
+                    .onChange(of: viewModel.messages.count) { _, count in
+                        print("📊 SUMMARY after count change to \(count):")
+                        print("  Total messages: \(viewModel.messages.count)")
+                        print("  LazyVStack frame: \(lazyVStackFrame)")
+                    }
+                    .onChange(of: viewModel.messages.count) { _, _ in
+                        // Auto-scroll to new messages (optimized)
+                        if !userIsScrolling && !viewModel.messages.isEmpty {
+                            // Use lighter animation for better performance
+                            withAnimation(.easeOut(duration: 0.2)) {
+                                if viewModel.isTyping {
+                                    proxy.scrollTo("typing-indicator", anchor: .bottom)
+                                } else {
+                                    proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
+                                }
                             }
                         }
                     }
-                }
-                .onChange(of: viewModel.isTyping) {
+                .onChange(of: viewModel.isTyping) { _, _ in
                     // Only animate typing indicator changes
                     if viewModel.isTyping && !userIsScrolling {
                         withAnimation(.easeOut(duration: 0.15)) {
@@ -81,7 +118,7 @@ struct ChatView: View {
                         }
                     }
                 }
-                .onChange(of: viewModel.throttledScrollUpdate) {
+                .onChange(of: viewModel.throttledScrollUpdate) { _, _ in
                     // Optimized streaming scroll with reduced animation overhead
                     if !userIsScrolling && viewModel.currentStreamingMessage != nil {
                         // No animation during streaming for maximum performance
@@ -97,7 +134,7 @@ struct ChatView: View {
                         proxy.scrollTo(lastMessage.id, anchor: .bottom)
                     }
                 }
-                .onChange(of: viewModel.shouldScrollToBottom) { shouldScroll in
+                .onChange(of: viewModel.shouldScrollToBottom) { _, shouldScroll in
                     if shouldScroll && !viewModel.messages.isEmpty {
                         // Instant scroll without animation for chat switching performance
                         proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
@@ -126,10 +163,10 @@ struct ChatView: View {
             
         }
         .background(
-            // Click-blocking transparent background
+            // Transparent background for visual structure
             Color.black.opacity(0.001)
                 .contentShape(Rectangle())
-                .allowsHitTesting(true)
+                .allowsHitTesting(false)
         )
         .mask(
             // Gradient mask for fade effect at top and bottom
@@ -150,6 +187,7 @@ struct ChatView: View {
             )
         )
     }
+    
 }
 
 // MARK: - Preview

@@ -228,16 +228,24 @@ class ChatViewModel: ObservableObject {
     /// Delete a message
     /// - Parameter id: The ID of the message to delete
     func deleteMessage(id: UUID) {
+        print("🔥 DELETE MESSAGE called for ID: \(id)")
+        print("  Messages before deletion: \(messages.count)")
+        print("  Message IDs: \(messages.map { $0.id.uuidString.prefix(8) }.joined(separator: ", "))")
+        
         withAnimation(.easeInOut(duration: 0.2)) {
             messages.removeAll { $0.id == id }
         }
+        
+        print("  Messages after deletion: \(messages.count)")
+        print("  Remaining IDs: \(messages.map { $0.id.uuidString.prefix(8) }.joined(separator: ", "))")
         
         // Delete from database (async)
         Task {
             do {
                 try await databaseManager.deleteMessage(id: id)
+                print("  ✅ Database deletion successful")
             } catch {
-                print("Failed to delete message: \(error)")
+                print("  ❌ Failed to delete message from database: \(error)")
             }
         }
     }

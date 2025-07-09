@@ -121,13 +121,23 @@ struct ChatBubbleView: View {
             }
         }
         .padding(.horizontal, 4)
+        .contentShape(Rectangle()) // Ensure proper hit area
+        .onTapGesture {
+            print("🟣 TAP on message \(message.id.uuidString.prefix(8))")
+        }
         .contextMenu {
-            Button(action: copyMessage) {
+            Button(action: {
+                print("🔹 Context menu: Copy action for \(message.id.uuidString.prefix(8))")
+                copyMessage()
+            }) {
                 Label("Copy", systemImage: "doc.on.doc")
             }
             
             if enableMarkdownRendering {
-                Button(action: copyAsMarkdown) {
+                Button(action: {
+                    print("🔹 Context menu: Copy as Markdown for \(message.id.uuidString.prefix(8))")
+                    copyAsMarkdown()
+                }) {
                     Label("Copy as Markdown", systemImage: "doc.richtext")
                 }
             }
@@ -135,10 +145,18 @@ struct ChatBubbleView: View {
             if let onDelete = onDelete {
                 Divider()
                 
-                Button(role: .destructive, action: onDelete) {
+                Button(role: .destructive, action: {
+                    print("🔹 Context menu: Delete action for \(message.id.uuidString.prefix(8))")
+                    onDelete()
+                }) {
                     Label("Delete", systemImage: "trash")
                 }
             }
+        }
+        .onLongPressGesture(minimumDuration: 0.5) {
+            print("🔴 LONG PRESS detected on message \(message.id.uuidString.prefix(8))")
+            print("  Message content length: \(message.content.count)")
+            print("  Is user message: \(message.isUser)")
         }
     }
     
@@ -231,7 +249,7 @@ struct ChatBubbleView: View {
     
     // MARK: - Methods
     
-    private func copyMessage() {
+    func copyMessage() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(message.content, forType: .string)
         

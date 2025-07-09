@@ -1,0 +1,176 @@
+{
+  "source": "/Users/guppy57/GitHub/SideChat/SideChat/Views/APIKeySettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Default",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Provider",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove Provider",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "No Provider Selected",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 135
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select a provider from the list or add a new one",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "Set as Default",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 165
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 176
+        }
+      },
+      {
+        "comment": "",
+        "key": "Set a friendly name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 180
+        }
+      },
+      {
+        "comment": "",
+        "key": "API key provided by %@.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 223
+        }
+      },
+      {
+        "comment": "",
+        "key": "API Key",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "Find my key →",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 197
+        }
+      },
+      {
+        "comment": "",
+        "key": "API Key",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "API Key",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 208
+        }
+      },
+      {
+        "comment": "",
+        "key": "Base URL:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 230
+        }
+      },
+      {
+        "comment": "",
+        "key": "The Base URL of the %@ API. Leave empty for default.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 240
+        }
+      },
+      {
+        "comment": "",
+        "key": "Base URL",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 234
+        }
+      },
+      {
+        "comment": "",
+        "key": "Default Model:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 247
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 252
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 263
+        }
+      },
+      {
+        "comment": "",
+        "key": "Refresh available models",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 266
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Changes",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 277
+        }
+      }
+    ]
+  },
+  "version": 1
+}
