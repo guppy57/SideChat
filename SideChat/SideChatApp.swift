@@ -40,12 +40,10 @@ struct SideChatApp: App {
                 .environmentObject(defaultsManager)
         }
         
-        #if DEBUG
         Settings {
-            DebugSettingsView()
+            SettingsView()
                 .environmentObject(defaultsManager)
         }
-        #endif
     }
 }
 

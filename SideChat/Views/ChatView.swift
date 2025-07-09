@@ -26,8 +26,8 @@ struct ChatView: View {
                     // Spacer to push content to bottom
                     Spacer(minLength: 0)
                     
-                    // Messages container
-                    VStack(spacing: 12) {
+                    // Messages container with lazy loading for performance
+                    LazyVStack(spacing: 12) {
                         ForEach(viewModel.messages) { message in
                             ChatBubbleView(message: message)
                                 .id(message.id)
@@ -49,9 +49,10 @@ struct ChatView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .onChange(of: viewModel.messages.count) {
-                    // Auto-scroll to new messages
-                    if !userIsScrolling {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                    // Auto-scroll to new messages (optimized)
+                    if !userIsScrolling && !viewModel.messages.isEmpty {
+                        // Use lighter animation for better performance
+                        withAnimation(.easeOut(duration: 0.2)) {
                             if viewModel.isTyping {
                                 proxy.scrollTo("typing-indicator", anchor: .bottom)
                             } else {
@@ -61,31 +62,34 @@ struct ChatView: View {
                     }
                 }
                 .onChange(of: viewModel.isTyping) {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        if viewModel.isTyping {
+                    // Only animate typing indicator changes
+                    if viewModel.isTyping && !userIsScrolling {
+                        withAnimation(.easeOut(duration: 0.15)) {
                             proxy.scrollTo("typing-indicator", anchor: .bottom)
                         }
                     }
                 }
                 .onChange(of: viewModel.throttledScrollUpdate) {
-                    // Auto-scroll during streaming if user isn't manually scrolling
-                    if !userIsScrolling {
-                        // Use faster animation during streaming for more responsive scrolling
-                        let animationDuration = viewModel.currentStreamingMessage != nil ? 0.1 : 0.2
-                        
-                        withAnimation(.easeInOut(duration: animationDuration)) {
-                            if viewModel.isTyping {
-                                proxy.scrollTo("typing-indicator", anchor: .bottom)
-                            } else if let lastMessage = viewModel.messages.last {
-                                // Always use bottom anchor for consistent scrolling
-                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                            }
+                    // Optimized streaming scroll with reduced animation overhead
+                    if !userIsScrolling && viewModel.currentStreamingMessage != nil {
+                        // No animation during streaming for maximum performance
+                        if viewModel.isTyping {
+                            proxy.scrollTo("typing-indicator", anchor: .bottom)
+                        } else if let lastMessage = viewModel.messages.last {
+                            proxy.scrollTo(lastMessage.id, anchor: .bottom)
                         }
                     }
                 }
                 .onAppear {
                     if let lastMessage = viewModel.messages.last {
                         proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                    }
+                }
+                .onChange(of: viewModel.shouldScrollToBottom) { shouldScroll in
+                    if shouldScroll && !viewModel.messages.isEmpty {
+                        // Instant scroll without animation for chat switching performance
+                        proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
+                        viewModel.resetScrollToBottom()
                     }
                 }
                 }

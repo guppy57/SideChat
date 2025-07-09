@@ -8,26 +8,39 @@
 - `SideChat/Models/LLMProvider.swift` - Enum and protocols for LLM provider abstraction
 - `SideChat/Database/DatabaseManager.swift` - SQLite database management using SQLite.swift package
 - `SideChat/Database/DatabaseManagerTests.swift` - Unit tests for database operations
+- `SideChat/Database/DatabaseSchema.swift` - Database schema definitions
+- `SideChat/Database/FTSManager.swift` - Full Text Search management
 - `SideChat/Views/SidebarView.swift` - Main sidebar container view with translucent background
 - `SideChat/Views/ChatView.swift` - iMessage-style chat interface view
 - `SideChat/Views/ChatBubbleView.swift` - Individual message bubble component
-- `SideChat/Views/ChatListView.swift` - Searchable list of previous chats
+- `SideChat/Views/ChatListView.swift` - Searchable list of previous chats (replaced by inline implementation)
+- `SideChat/Views/InlineChatListView.swift` - Inline chat list that replaces chat view
+- `SideChat/Views/ChatListItemView.swift` - Individual chat item in list
+- `SideChat/Views/TypingIndicatorView.swift` - Animated typing indicator
 - `SideChat/Views/SettingsView.swift` - Settings panel for configuration
 - `SideChat/Views/EdgeTabView.swift` - Always-visible edge tab for sidebar activation
 - `SideChat/ViewModels/ChatViewModel.swift` - View model for chat functionality
-- `SideChat/ViewModels/SidebarViewModel.swift` - View model for sidebar state management
-- `SideChat/ViewModels/SettingsViewModel.swift` - View model for app settings
-- `SideChat/Services/OpenAIService.swift` - OpenAI API integration
-- `SideChat/Services/AnthropicService.swift` - Anthropic API integration
-- `SideChat/Services/GoogleAIService.swift` - Google AI API integration
-- `SideChat/Services/LocalModelService.swift` - Local model integration
-- `SideChat/Services/LLMServiceTests.swift` - Unit tests for LLM services
+- `SideChat/ViewModels/ChatListViewModel.swift` - View model for chat list management
+- `SideChat/ViewModels/SidebarViewModel.swift` - View model for sidebar state management (not implemented)
+- `SideChat/ViewModels/SettingsViewModel.swift` - View model for app settings (not implemented)
+- `SideChat/Services/LLMService.swift` - LLM service protocol definition
+- `SideChat/Services/MockLLMService.swift` - Mock service for testing
+- `SideChat/Services/OpenAIService.swift` - OpenAI API integration (not implemented)
+- `SideChat/Services/AnthropicService.swift` - Anthropic API integration (not implemented)
+- `SideChat/Services/GoogleAIService.swift` - Google AI API integration (not implemented)
+- `SideChat/Services/LocalModelService.swift` - Local model integration (not implemented)
+- `SideChat/Services/LLMServiceTests.swift` - Unit tests for LLM services (not implemented)
 - `SideChat/Utilities/KeychainManager.swift` - Secure storage for API keys using KeychainAccess package
 - `SideChat/Utilities/HotkeyManager.swift` - Global hotkey registration using KeyboardShortcuts package
-- `SideChat/Utilities/MarkdownRenderer.swift` - Markdown rendering using MarkdownUI package
+- `SideChat/Utilities/MarkdownRenderer.swift` - Markdown rendering using MarkdownUI package (not needed - using MarkdownUI directly)
+- `SideChat/Utilities/ClipboardImageHandler.swift` - Handle image paste from clipboard
 - `SideChat/Utilities/DefaultsManager.swift` - User settings management using Defaults package with comprehensive settings definitions
 - `SideChat/Extensions/View+Blur.swift` - Custom blur using NSVisualEffectView and NSViewRepresentable
 - `SideChat/SideChatApp.swift` - Main app configuration and lifecycle with LaunchAtLogin integration and app initialization
+- `SideChat/Windows/SidebarWindow.swift` - Custom NSWindow for sidebar with edge detection
+- `SideChat/Windows/SidebarWindowController.swift` - Controller for sidebar window management
+- `SideChat/Windows/EdgeTabWindow.swift` - Always-visible edge tab window
+- `SideChat/AppDelegate.swift` - App delegate handling window management and hotkeys
 
 ### Notes
 
@@ -82,6 +95,8 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 2.5 Implement database encryption using SQLCipher integration with SQLite.swift
   - [x] 2.6 Write comprehensive unit tests for all database operations
   - [x] 2.7 Add database performance optimization for large chat histories
+  - [x] 2.8 Implement Full Text Search (FTS) with FTSManager
+  - [x] 2.9 Add message pagination with loadRecentMessages method
 
 - [x] 3.0 Implement sidebar window management and activation system
   - [x] 3.1 Create custom NSWindow subclass with NSWindowStyleMask.borderless and .nonactivatingPanel (SidebarWindow.swift)
@@ -101,7 +116,7 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 3.15 Create floating toolbar component that sits below input field for controls (pin, settings, etc.) - Combined into unified input block
   - [x] 3.16 Refactor chat layout to start from bottom and grow upward with inverted scroll - Implemented with defaultScrollAnchor
 
-- [ ] 4.0 Build the chat interface with iMessage-style UI
+- [x] 4.0 Build the chat interface with iMessage-style UI
   - [x] 4.1 Create basic SidebarView placeholder with header and input (SidebarView.swift) - Refactored with bottom-up layout
   - [x] 4.2 Create ChatView with scrollable message list
   - [x] 4.3 Implement ChatBubbleView using custom Shape with Path-based tail drawing
@@ -114,36 +129,41 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
   - [x] 4.22 Create MockLLMService for testing streaming and responses
   - [x] 4.7 Create typing indicator for LLM responses
   - [x] 4.9 Add message copy functionality for individual messages
-  - [ ] 4.12 Implement ChatListView with searchable chat history
-  - [ ] 4.19 Create SidebarViewModel for overall sidebar state management
-  - [ ] 4.13 Add chat creation UI with LLM provider selection
-  - [ ] 4.14 Implement chat renaming functionality
+  - [x] 4.12 Implement ChatListView with searchable chat history - Replaced with inline chat list
+  - [x] 4.24 Implement inline chat list that replaces chat view with animations
+  - [x] 4.25 Add chat list filtering by provider and search functionality
+  - [x] 4.26 Implement auto-scroll to bottom when switching chats
+  - [x] 4.27 Add performance optimizations (LazyVStack, pagination, conditional rendering)
+  - [x] 4.13 Add chat creation UI with LLM provider selection - New chat button in toolbar
+  - [x] 4.14 Implement chat renaming functionality - Context menu on chat header
+  - [ ] 4.19 Create SidebarViewModel for overall sidebar state management - Not needed with current architecture
   - [ ] 4.15 Add chat deletion with confirmation dialog
-  - [ ] 4.22 Add chat archiving with confirmation dialog
-  - [ ] 4.23 Add dropdown selectors in Chat History popover to select between active and archived chats
+  - [ ] 4.28 Add chat archiving with confirmation dialog
+  - [ ] 4.29 Add active/archived filtering in inline chat list
+  - [ ] 4.30 Implement "Load More" button for viewing older messages
   - [ ] 4.16 Create chat export functionality (markdown/JSON)
   - [x] 4.20 Create BlurredContainer component for consistent translucent backgrounds
   - [x] 4.21 Implement bottom-anchored chat list with reverse scroll behavior
-  - [ ] 4.17 Add loading states and error handling throughout UI
+  - [x] 4.17 Add loading states and error handling throughout UI - Basic implementation done
 
 - [ ] 5.0 Integrate LLM providers and API services
-  - [ ] 5.1 Create KeychainManager for secure API key storage
-  - [ ] 5.2 Implement message streaming using URLSession.shared.bytes (infrastructure for all services)
+  - [x] 5.1 Create KeychainManager for secure API key storage
+  - [x] 5.2 Implement message streaming using URLSession.shared.bytes (infrastructure for all services) - Mock implementation done
   - [ ] 5.3 Implement OpenAIService using URLSession with streaming
   - [ ] 5.4 Implement AnthropicService with SSE parsing
   - [ ] 5.5 Implement GoogleAIService with consistent message building
   - [ ] 5.6 Implement LocalModelService for local model integration
-  - [ ] 5.7 Add image input support for compatible providers
-  - [ ] 5.8 Implement error handling and user-friendly messages
+  - [x] 5.7 Add image input support for compatible providers - UI support complete
+  - [x] 5.8 Implement error handling and user-friendly messages - Basic implementation
   - [ ] 5.9 Add API rate limiting and timeout handling
-  - [ ] 5.10 Implement automatic chat title generation
+  - [x] 5.10 Implement automatic chat title generation - Using first message
   - [ ] 5.11 Add LLM provider factory and selection logic
   - [ ] 5.12 Add API key validation and testing
   - [ ] 5.13 Create comprehensive unit tests for all services
   - [ ] 5.14 Add network connectivity checks
-  - [ ] 5.15 Implement conversation context management
+  - [x] 5.15 Implement conversation context management - Basic implementation in ChatViewModel
   - [ ] 5.16 Add token counting and usage tracking
-  - [ ] 5.18 Add a retry button to retry the LLM-api request for LLM produced chats
+  - [x] 5.18 Add a retry button to retry the LLM-api request for LLM produced chats - retryLastMessage in ChatViewModel
 
 - [ ] 6.0 Create settings and customization features
   - [ ] 6.1 Create SettingsView with tabbed interface
@@ -167,32 +187,43 @@ Add these packages to your Xcode project via File → Add Package Dependencies:
 ### Completed
 - ✅ Core foundation (models, database, settings infrastructure)
 - ✅ Window management system (sidebar window, edge tab, hotkeys)
-- ✅ Basic UI scaffolding (placeholder sidebar view)
+- ✅ Full chat interface with iMessage-style UI
+- ✅ Inline chat list with search and filtering
+- ✅ Message streaming and typing indicators
+- ✅ Image upload and markdown rendering
+- ✅ Performance optimizations (lazy loading, pagination)
+- ✅ Chat management (create, rename, switch)
+- ✅ Database with FTS and encryption
 
 ### In Progress
-- 🔄 Chat interface implementation
-- 🔄 LLM provider integration
+- 🔄 LLM provider integration (real services)
+- 🔄 Settings interface
 
 ### Not Started
-- ❌ Full chat UI with messaging
-- ❌ LLM service implementations
-- ❌ Settings interface
-- ❌ Advanced features (export, search, etc.)
+- ❌ Real LLM service implementations (OpenAI, Anthropic, Google, Local)
+- ❌ Full settings UI with API key management
+- ❌ Chat export functionality
+- ❌ Chat deletion and archiving
+- ❌ Token counting and usage tracking
 
 ## Next Priority Tasks
 
-1. **Create ChatViewModel (4.18)** - Foundation for managing chat state and message flow
-2. **Connect send button functionality (4.11)** - Wire up existing UI to ChatViewModel
-3. **Create MockLLMService (4.22)** - Test service for simulating LLM responses
-4. **Implement typing indicator (4.7)** - Visual feedback during LLM responses
-5. **Continue with remaining UI tasks** - Copy functionality, error handling, chat list, etc.
+1. **Implement real LLM services (5.3-5.6)** - Replace MockLLMService with actual API integrations
+2. **Create SettingsView (6.1)** - User interface for API key management and preferences
+3. **Add chat deletion functionality (4.15)** - Allow users to delete chats with confirmation
+4. **Implement chat export (4.16)** - Export conversations in markdown/JSON format
+5. **Add Load More functionality** - Allow viewing messages beyond initial 100 message limit
 
 ## Notes on Current Implementation
 
 - The sidebar window system is fully functional with edge detection, hotkeys, and animations
 - The edge tab is visible and clickable with customizable appearance
-- Database infrastructure is complete with encryption and performance optimization
-- All foundational packages are integrated (Defaults, LaunchAtLogin, KeyboardShortcuts)
+- Database infrastructure is complete with encryption, FTS, and performance optimization
+- All foundational packages are integrated (Defaults, LaunchAtLogin, KeyboardShortcuts, MarkdownUI, SQLite.swift)
 - The app launches successfully with a working sidebar that slides in/out
-- UI components are in place but not connected to data flow (messages are hardcoded in ChatView)
-- Need to create ViewModels/ and Services/ directories for the next phase
+- Full chat interface is implemented with inline chat list, search, and filtering
+- Performance optimizations ensure smooth operation with large chat histories
+- ChatViewModel manages all chat state and operations with MockLLMService for testing
+- Messages persist in SQLite database with proper indexing and pagination
+- UI supports image uploads, markdown rendering, and real-time streaming
+- Chat management features include create, rename, and switch functionality

@@ -25,6 +25,7 @@ struct SidebarView: View {
     @StateObject private var chatListViewModel = ChatListViewModel()
     @State private var showChatList = false
     @FocusState private var isMessageFieldFocused: Bool
+    @Environment(\.openSettings) private var openSettings
     
     // MARK: - Initialization
     
@@ -38,40 +39,39 @@ struct SidebarView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Main content area with chat view or chat list
-            ZStack {
-                // Chat view (default state)
-                ChatView(viewModel: chatViewModel)
-                    .opacity(showChatList ? 0 : 1)
-                    .scaleEffect(showChatList ? 0.95 : 1.0)
-                    .zIndex(showChatList ? 0 : 1)
-                
+            // Main content area with conditional rendering for performance
+            if showChatList {
                 // Inline chat list view
-                if showChatList {
-                    InlineChatListView(
-                        chatListViewModel: chatListViewModel,
-                        selectedChatId: $selectedChatId,
-                        onChatSelected: { chatId in
-                            Task {
-                                await switchToChat(chatId)
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    showChatList = false
-                                }
-                                // Delay focus to ensure view transition is complete
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                    isMessageFieldFocused = true
-                                }
-                            }
-                        },
-                        onClose: {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                showChatList = false
+                InlineChatListView(
+                    chatListViewModel: chatListViewModel,
+                    selectedChatId: $selectedChatId,
+                    onChatSelected: { chatId in
+                        // Immediate visual feedback and animation start
+                        selectedChatId = chatId
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showChatList = false
+                        }
+                        
+                        // Load chat data in background while animation plays
+                        Task {
+                            await switchToChat(chatId)
+                            // Delay focus to ensure view transition is complete
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                isMessageFieldFocused = true
                             }
                         }
-                    )
-                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                    .zIndex(1)
-                }
+                    },
+                    onClose: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showChatList = false
+                        }
+                    }
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            } else {
+                // Chat view (only rendered when not showing chat list)
+                ChatView(viewModel: chatViewModel)
+                    .transition(.opacity.combined(with: .scale(scale: 1.05)))
             }
             
             // Combined input and toolbar area
@@ -116,24 +116,71 @@ struct SidebarView: View {
                     
                     Spacer()
                     
-                    // Provider badge
-                    HStack(spacing: 4) {
-                        Image(systemName: providerIcon(for: chat.llmProvider))
-                            .font(.system(size: 11))
-                        Text(chat.llmProvider.displayName)
-                            .font(.system(size: 11, weight: .medium))
+                    // Provider selector
+                    if !chatViewModel.availableProviders.isEmpty {
+                        Menu {
+                            ForEach(chatViewModel.availableProviders) { config in
+                                Button(action: {
+                                    chatViewModel.switchToProvider(config.id)
+                                }) {
+                                    HStack {
+                                        Image(systemName: providerIcon(for: config.provider))
+                                        Text("\(config.friendlyName) (\(config.selectedModel))")
+                                        if config.id == chatViewModel.currentProviderId {
+                                            Spacer()
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                if let currentConfig = chatViewModel.currentProviderConfig {
+                                    Image(systemName: providerIcon(for: currentConfig.provider))
+                                        .font(.system(size: 11))
+                                    Text(currentConfig.friendlyName)
+                                        .font(.system(size: 11, weight: .medium))
+                                } else {
+                                    Image(systemName: "exclamationmark.triangle")
+                                        .font(.system(size: 11))
+                                    Text("No Provider")
+                                        .font(.system(size: 11, weight: .medium))
+                                }
+                            }
+                            .foregroundColor(providerColor(for: chatViewModel.currentProviderConfig?.provider ?? .openai))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(providerColor(for: chatViewModel.currentProviderConfig?.provider ?? .openai).opacity(0.15))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(providerColor(for: chatViewModel.currentProviderConfig?.provider ?? .openai).opacity(0.3), lineWidth: 0.5)
+                            )
+                        }
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.visible)
+                    } else {
+                        // No configured providers
+                        HStack(spacing: 4) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.system(size: 11))
+                            Text("No Providers")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .foregroundColor(.orange)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.orange.opacity(0.15))
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.orange.opacity(0.3), lineWidth: 0.5)
+                        )
                     }
-                    .foregroundColor(providerColor(for: chat.llmProvider))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .fill(providerColor(for: chat.llmProvider).opacity(0.15))
-                    )
-                    .overlay(
-                        Capsule()
-                            .stroke(providerColor(for: chat.llmProvider).opacity(0.3), lineWidth: 0.5)
-                    )
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
@@ -295,7 +342,7 @@ struct SidebarView: View {
                 .buttonStyle(PlainButtonStyle())
                 .help(SidebarWindowController.shared.isSidebarPinned ? "Unpin Sidebar" : "Pin Sidebar")
                 
-                Button(action: showSettings) {
+                Button(action: { openSettings() }) {
                     Image(systemName: "gear")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Color.primary.opacity(0.7))
@@ -373,9 +420,6 @@ struct SidebarView: View {
         SidebarWindowController.shared.setSidebarPinned(!currentState)
     }
     
-    private func showSettings() {
-        NotificationCenter.default.post(name: .hotkeySettingsPanel, object: nil)
-    }
     
     private func sendMessage() {
         let trimmedMessage = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -541,13 +585,28 @@ struct InlineChatListView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(NSColor.controlBackgroundColor).opacity(0.95))
+            ZStack {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(NSColor.controlBackgroundColor).opacity(0.8))
+                
+                BlurredBackgroundView(
+                    material: .sidebar,
+                    opacity: 1.0
+                )
+                .cornerRadius(20)
+            }
+            .shadow(
+                color: Color.black.opacity(0.25),
+                radius: 10,
+                x: 0,
+                y: 3
+            )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.primary.opacity(0.1), lineWidth: 1)
         )
+        .padding(16)
         .onAppear {
             chatListViewModel.selectedChatId = selectedChatId
             isSearchFocused = true
@@ -556,20 +615,13 @@ struct InlineChatListView: View {
     
     private var headerView: some View {
         VStack(spacing: 12) {
-            // Header with close button
+            // Header
             HStack {
                 Text("Chat History")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.primary)
                 
                 Spacer()
-                
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(PlainButtonStyle())
             }
             
             // Search bar

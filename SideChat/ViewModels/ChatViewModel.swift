@@ -19,6 +19,7 @@ class ChatViewModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var lastMessageUpdate = Date()
     @Published private(set) var throttledScrollUpdate = Date()
+    @Published private(set) var shouldScrollToBottom = false
     
     // Scroll throttling
     private var scrollThrottleTimer: Timer?
@@ -28,23 +29,41 @@ class ChatViewModel: ObservableObject {
     
     private(set) var chatId: UUID
     private let databaseManager: DatabaseManager
-    private var llmService: LLMServiceProtocol?
     private var streamingTask: Task<Void, Never>?
+    
+    // Current provider configuration
+    @Published private(set) var currentProviderId: UUID?
+    @Published private(set) var currentService: LLMServiceProtocol?
+    @Published private(set) var availableProviders: [ProviderConfiguration] = []
     
     // Settings
     @Default(.defaultLLMProvider) private var defaultProvider
+    @Default(.providerConfigurations) private var providerConfigurations
+    
+    // Provider configuration status observation
+    @Default(.hasConfiguredOpenAI) private var hasConfiguredOpenAI
+    @Default(.hasConfiguredAnthropic) private var hasConfiguredAnthropic
+    @Default(.hasConfiguredGoogleAI) private var hasConfiguredGoogleAI
+    @Default(.hasConfiguredLocalModel) private var hasConfiguredLocalModel
+    
+    // Model selection
+    @Default(.selectedOpenAIModel) private var selectedOpenAIModel
+    @Default(.selectedAnthropicModel) private var selectedAnthropicModel
+    @Default(.selectedGoogleModel) private var selectedGoogleModel
+    
+    private let forceUseMockService: Bool
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initialization
     
-    init(chatId: UUID? = nil, databaseManager: DatabaseManager? = nil, useMockService: Bool = true, autoLoadMessages: Bool = true) {
+    init(chatId: UUID? = nil, databaseManager: DatabaseManager? = nil, forceUseMockService: Bool = false, autoLoadMessages: Bool = true) {
         self.chatId = chatId ?? UUID()
         self.databaseManager = databaseManager ?? DatabaseManager.shared
+        self.forceUseMockService = forceUseMockService
         
-        // Initialize mock service for development
-        // TODO: Replace with real service initialization based on settings
-        if useMockService {
-            self.llmService = MockLLMService(provider: defaultProvider)
-        }
+        // Initialize appropriate LLM service based on configuration
+        loadAvailableProviders()
+        setupDefaultService()
         
         // Load messages on init only if not in test environment and autoLoadMessages is true
         // This prevents crashes when DatabaseManager.shared isn't initialized during tests
@@ -54,28 +73,51 @@ class ChatViewModel: ObservableObject {
                 await loadMessages()
             }
         }
+        
+        // Observe provider changes and recreate service when needed
+        setupProviderObservation()
     }
     
     deinit {
         streamingTask?.cancel()
         scrollThrottleTimer?.invalidate()
+        cancellables.removeAll()
     }
     
     // MARK: - Public Methods
     
-    /// Load messages from database
+    /// Load recent messages from database with pagination for performance
     func loadMessages() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            // Load only recent 100 messages for performance
+            messages = try await databaseManager.loadRecentMessages(for: chatId, limit: 100)
+            
+            // Trigger scroll to bottom after messages are loaded
+            shouldScrollToBottom = true
+            
+            // If no messages exist, don't load mock data
+            // Let the user start fresh
+        } catch {
+            print("Failed to load messages: \(error)")
+            self.error = error
+        }
+    }
+    
+    /// Load all messages from database (for search/export features)
+    func loadAllMessages() async {
         isLoading = true
         defer { isLoading = false }
         
         do {
             messages = try await databaseManager.loadMessages(for: chatId)
             
-            
-            // If no messages exist, don't load mock data
-            // Let the user start fresh
+            // Trigger scroll to bottom after messages are loaded
+            shouldScrollToBottom = true
         } catch {
-            print("Failed to load messages: \(error)")
+            print("Failed to load all messages: \(error)")
             self.error = error
         }
     }
@@ -131,7 +173,7 @@ class ChatViewModel: ObservableObject {
             do {
                 // If this is the first message, create and save the chat
                 if messages.count == 1 {
-                    var newChat = Chat(
+                    let newChat = Chat(
                         id: chatId,  // Use existing chat ID
                         title: generateChatTitle(from: trimmedContent),
                         createdAt: Date(),
@@ -230,13 +272,15 @@ class ChatViewModel: ObservableObject {
             isTyping = true
         }
         
-        // Create bot message
+        // Create bot message with current provider configuration
+        let currentConfig = providerConfigurations.first(where: { $0.id == currentProviderId })
         var botMessage = Message.createBotMessage(
             chatId: chatId,
             content: "",
             metadata: MessageMetadata(
-                model: getDefaultModel(),
-                provider: defaultProvider
+                model: currentConfig?.selectedModel ?? getDefaultModel(),
+                provider: currentConfig?.provider ?? defaultProvider,
+                providerConfigId: currentProviderId
             ),
             status: .streaming
         )
@@ -254,15 +298,17 @@ class ChatViewModel: ObservableObject {
         }
         
         do {
-            // Use LLM service (mock or real)
-            guard let service = llmService else {
+            // Use current LLM service
+            guard let service = currentService else {
                 throw LLMServiceError.notConfigured
             }
             
+            // Pass chat history without the current user message (it was just added)
+            let historyWithoutCurrent = messages.dropLast()
             let stream = try await service.sendMessage(
                 content: userMessage.content,
                 images: userMessage.imageData != nil ? [userMessage.imageData!] : [],
-                chatHistory: messages // Bot message not added yet
+                chatHistory: Array(historyWithoutCurrent)
             )
             
             // Process stream
@@ -355,6 +401,11 @@ class ChatViewModel: ObservableObject {
         }
     }
     
+    /// Reset the scroll to bottom flag
+    func resetScrollToBottom() {
+        shouldScrollToBottom = false
+    }
+    
     /// Finalize a message after streaming completes
     private func finalizeMessage(_ message: Message) {
         guard let index = messages.firstIndex(where: { $0.id == message.id }) else { return }
@@ -402,15 +453,142 @@ class ChatViewModel: ObservableObject {
         ]
     }
     
+    /// Load available provider configurations
+    private func loadAvailableProviders() {
+        availableProviders = providerConfigurations.filter { config in
+            KeychainManager.hasAPIKey(for: config.provider)
+        }
+    }
+    
+    /// Setup the default service on initialization
+    private func setupDefaultService() {
+        if forceUseMockService {
+            currentService = MockLLMService(provider: defaultProvider)
+            return
+        }
+        
+        // Try to use the default configuration
+        if let defaultServiceInfo = LLMServiceFactory.getDefaultService() {
+            currentService = defaultServiceInfo.service
+            currentProviderId = defaultServiceInfo.configId
+        } else {
+            // Fallback to mock service
+            currentService = MockLLMService(provider: defaultProvider)
+        }
+    }
+    
+    /// Switch to a different provider configuration
+    func switchToProvider(_ configId: UUID) {
+        guard let config = LLMServiceFactory.getConfiguration(by: configId) else {
+            print("Configuration not found: \(configId)")
+            return
+        }
+        
+        // Cancel any ongoing streaming
+        streamingTask?.cancel()
+        
+        // Create new service
+        if let service = LLMServiceFactory.createService(for: config) {
+            currentService = service
+            currentProviderId = configId
+        } else {
+            print("Failed to create service for configuration: \(config.friendlyName)")
+        }
+    }
+    
+    /// Get the current provider configuration
+    var currentProviderConfig: ProviderConfiguration? {
+        guard let configId = currentProviderId else { return nil }
+        return providerConfigurations.first { $0.id == configId }
+    }
+    
+    /// Setup observation of provider changes
+    private func setupProviderObservation() {
+        // Observe provider changes
+        Defaults.publisher(.defaultLLMProvider)
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.handleProviderChange()
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Observe configuration status changes
+        Publishers.CombineLatest4(
+            Defaults.publisher(.hasConfiguredOpenAI),
+            Defaults.publisher(.hasConfiguredAnthropic),
+            Defaults.publisher(.hasConfiguredGoogleAI),
+            Defaults.publisher(.hasConfiguredLocalModel)
+        )
+        .sink { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.handleConfigurationChange()
+            }
+        }
+        .store(in: &cancellables)
+        
+        // Observe model selection changes
+        Publishers.CombineLatest3(
+            Defaults.publisher(.selectedOpenAIModel),
+            Defaults.publisher(.selectedAnthropicModel),
+            Defaults.publisher(.selectedGoogleModel)
+        )
+        .sink { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.handleModelChange()
+            }
+        }
+        .store(in: &cancellables)
+    }
+    
+    /// Handle provider changes
+    private func handleProviderChange() {
+        // Cancel any ongoing streaming
+        streamingTask?.cancel()
+        
+        // Reload available providers
+        loadAvailableProviders()
+        
+        // If current provider is no longer available, switch to default
+        if let currentId = currentProviderId,
+           !availableProviders.contains(where: { $0.id == currentId }) {
+            setupDefaultService()
+        }
+    }
+    
+    /// Handle configuration status changes
+    private func handleConfigurationChange() {
+        // Reload available providers
+        loadAvailableProviders()
+        
+        // If current configuration changed, reload it
+        if let currentId = currentProviderId,
+           let config = providerConfigurations.first(where: { $0.id == currentId }) {
+            if let service = LLMServiceFactory.createService(for: config) {
+                currentService = service
+            } else {
+                // Configuration is no longer valid, switch to default
+                setupDefaultService()
+            }
+        }
+    }
+    
+    /// Handle model selection changes
+    private func handleModelChange() {
+        // Model changes don't require service recreation
+        // The service will use the updated model on the next request
+    }
+    
     /// Get the default model for the current provider
     private func getDefaultModel() -> String {
         switch defaultProvider {
         case .openai:
-            return "gpt-4-turbo-preview"
+            return selectedOpenAIModel
         case .anthropic:
-            return "claude-3-opus-20240229"
+            return selectedAnthropicModel
         case .google:
-            return "gemini-pro"
+            return selectedGoogleModel
         case .local:
             return "local-model"
         }

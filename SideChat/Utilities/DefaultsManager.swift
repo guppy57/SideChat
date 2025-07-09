@@ -72,6 +72,21 @@ extension Defaults.Keys {
     static let enableBetaFeatures = Key<Bool>("enableBetaFeatures", default: false)
     static let enableDebugMode = Key<Bool>("enableDebugMode", default: false)
     static let enableAnalytics = Key<Bool>("enableAnalytics", default: false)
+    
+    // MARK: - API Key Status (Note: actual keys are stored in Keychain)
+    static let hasConfiguredOpenAI = Key<Bool>("hasConfiguredOpenAI", default: false)
+    static let hasConfiguredAnthropic = Key<Bool>("hasConfiguredAnthropic", default: false)
+    static let hasConfiguredGoogleAI = Key<Bool>("hasConfiguredGoogleAI", default: false)
+    static let hasConfiguredLocalModel = Key<Bool>("hasConfiguredLocalModel", default: false)
+    static let lastAPIKeyCheck = Key<Date>("lastAPIKeyCheck", default: Date.distantPast)
+    
+    // MARK: - Selected Models
+    static let selectedOpenAIModel = Key<String>("selectedOpenAIModel", default: "gpt-4-turbo-preview")
+    static let selectedAnthropicModel = Key<String>("selectedAnthropicModel", default: "claude-3-opus-20240229")
+    static let selectedGoogleModel = Key<String>("selectedGoogleModel", default: "gemini-pro")
+    
+    // MARK: - Provider Configurations
+    static let providerConfigurations = Key<[ProviderConfiguration]>("providerConfigurations", default: [])
 }
 
 // MARK: - DefaultsManager Utility Class
@@ -147,9 +162,38 @@ class DefaultsManager: ObservableObject {
     @Default(.enableDebugMode) var enableDebugMode
     @Default(.enableAnalytics) var enableAnalytics
     
+    // MARK: - API Key Status
+    @Default(.hasConfiguredOpenAI) var hasConfiguredOpenAI
+    @Default(.hasConfiguredAnthropic) var hasConfiguredAnthropic
+    @Default(.hasConfiguredGoogleAI) var hasConfiguredGoogleAI
+    @Default(.hasConfiguredLocalModel) var hasConfiguredLocalModel
+    @Default(.lastAPIKeyCheck) var lastAPIKeyCheck
+    
+    // MARK: - Selected Models
+    @Default(.selectedOpenAIModel) var selectedOpenAIModel
+    @Default(.selectedAnthropicModel) var selectedAnthropicModel
+    @Default(.selectedGoogleModel) var selectedGoogleModel
+    
     // MARK: - Utility Methods
     
     func resetToDefaults() {
         Defaults.removeAll()
+    }
+    
+    // MARK: - API Key Status Updates
+    
+    func updateAPIKeyStatus() {
+        hasConfiguredOpenAI = KeychainManager.hasAPIKey(for: .openai)
+        hasConfiguredAnthropic = KeychainManager.hasAPIKey(for: .anthropic)
+        hasConfiguredGoogleAI = KeychainManager.hasAPIKey(for: .google)
+        hasConfiguredLocalModel = !localModelPath.isEmpty
+        lastAPIKeyCheck = Date()
+    }
+    
+    func clearAPIKeyStatus() {
+        hasConfiguredOpenAI = false
+        hasConfiguredAnthropic = false
+        hasConfiguredGoogleAI = false
+        hasConfiguredLocalModel = false
     }
 }

@@ -9,7 +9,7 @@ class MockLLMService: LLMServiceProtocol {
     // MARK: - Properties
     
     let provider: LLMProvider
-    var isConfigured: Bool = true
+    nonisolated var isConfigured: Bool { true }
     
     // Configuration options
     var responseDelay: UInt64 = 50_000_000 // 50ms between words
@@ -72,10 +72,10 @@ class MockLLMService: LLMServiceProtocol {
     func validateConfiguration() async -> Bool {
         // Simulate validation delay
         try? await Task.sleep(nanoseconds: 200_000_000) // 200ms
-        return isConfigured
+        return true
     }
     
-    func availableModels() -> [String] {
+    nonisolated func availableModels() -> [String] {
         switch provider {
         case .openai:
             return ["gpt-4-turbo-preview", "gpt-4", "gpt-3.5-turbo"]
@@ -88,7 +88,7 @@ class MockLLMService: LLMServiceProtocol {
         }
     }
     
-    func defaultModel() -> String {
+    nonisolated func defaultModel() -> String {
         switch provider {
         case .openai:
             return "gpt-4-turbo-preview"

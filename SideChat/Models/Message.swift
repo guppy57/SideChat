@@ -77,6 +77,7 @@ enum MessageStatus: String, Codable, CaseIterable {
 struct MessageMetadata: Codable, Hashable {
     let model: String?
     let provider: LLMProvider?
+    let providerConfigId: UUID? // Which provider configuration was used
     let responseTime: TimeInterval?
     let promptTokens: Int?
     let responseTokens: Int?
@@ -89,6 +90,7 @@ struct MessageMetadata: Codable, Hashable {
     init(
         model: String? = nil,
         provider: LLMProvider? = nil,
+        providerConfigId: UUID? = nil,
         responseTime: TimeInterval? = nil,
         promptTokens: Int? = nil,
         responseTokens: Int? = nil,
@@ -100,6 +102,7 @@ struct MessageMetadata: Codable, Hashable {
     ) {
         self.model = model
         self.provider = provider
+        self.providerConfigId = providerConfigId
         self.responseTime = responseTime
         self.promptTokens = promptTokens
         self.responseTokens = responseTokens
@@ -278,6 +281,7 @@ extension Message {
                 existingMetadata = MessageMetadata(
                     model: existingMetadata.model,
                     provider: existingMetadata.provider,
+                    providerConfigId: existingMetadata.providerConfigId,
                     responseTime: existingMetadata.responseTime,
                     promptTokens: existingMetadata.promptTokens,
                     responseTokens: existingMetadata.responseTokens,

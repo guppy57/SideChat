@@ -72,7 +72,7 @@ struct ChatBubbleView: View {
                     )
                 }
                 
-                // Timestamp and status
+                // Timestamp, status, and provider info
                 HStack(spacing: 4) {
                     if message.isUser {
                         if message.status == .sending {
@@ -84,6 +84,35 @@ struct ChatBubbleView: View {
                                 .font(.system(size: 10))
                                 .foregroundColor(.red)
                         }
+                    } else if let metadata = message.metadata {
+                        // Show provider badge for bot messages
+                        HStack(spacing: 4) {
+                            if let provider = metadata.provider {
+                                Image(systemName: providerIcon(for: provider))
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(providerColor(for: provider))
+                            }
+                            
+                            if let model = metadata.model {
+                                Text(model)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color(NSColor.controlBackgroundColor))
+                                .overlay(
+                                    Capsule()
+                                        .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
+                                )
+                        )
+                        
+                        Text("•")
+                            .font(.system(size: 8))
+                            .foregroundColor(.secondary)
                     }
                     
                     Text(message.formattedTimestamp)
@@ -209,6 +238,32 @@ struct ChatBubbleView: View {
             .alignment,
             performanceTime: .default
         )
+    }
+    
+    private func providerIcon(for provider: LLMProvider) -> String {
+        switch provider {
+        case .openai:
+            return "brain"
+        case .anthropic:
+            return "ant.circle"
+        case .google:
+            return "sparkle"
+        case .local:
+            return "desktopcomputer"
+        }
+    }
+    
+    private func providerColor(for provider: LLMProvider) -> Color {
+        switch provider {
+        case .openai:
+            return .green
+        case .anthropic:
+            return .orange
+        case .google:
+            return .blue
+        case .local:
+            return .purple
+        }
     }
     
     private func copyAsMarkdown() {
@@ -357,6 +412,10 @@ struct ChatBubbleView_Previews: PreviewProvider {
                 message: Message.createBotMessage(
                     chatId: UUID(),
                     content: "This is a bot response with a tail on the left side. It can contain longer text and multiple lines to demonstrate how the bubble expands.",
+                    metadata: MessageMetadata(
+                        model: "gpt-4",
+                        provider: .openai
+                    ),
                     status: .sent
                 )
             )
@@ -392,7 +451,11 @@ struct ChatBubbleView_Previews: PreviewProvider {
                     chatId: UUID(),
                     content: "Here's the analysis of your image:\n\nThe image shows a beautiful landscape with mountains in the background.",
                     isUser: false,
-                    imageData: NSImage(systemSymbolName: "mountain.2.fill", accessibilityDescription: nil)?.tiffRepresentation
+                    imageData: NSImage(systemSymbolName: "mountain.2.fill", accessibilityDescription: nil)?.tiffRepresentation,
+                    metadata: MessageMetadata(
+                        model: "claude-3-sonnet",
+                        provider: .anthropic
+                    )
                 )
             )
         }

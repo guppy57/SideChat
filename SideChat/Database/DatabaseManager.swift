@@ -665,6 +665,57 @@ class DatabaseManager: ObservableObject {
         return messageList
     }
     
+    /// Load recent messages for a chat with performance optimization
+    func loadRecentMessages(for chatId: UUID, limit: Int = 100) async throws -> [Message] {
+        try ensureInitialized()
+        guard let db = db else { throw DatabaseError.connectionFailed }
+        
+        var messageList: [Message] = []
+        // Get the most recent messages first, then reverse to maintain chronological order
+        let query = messages.filter(messageChatId == chatId.uuidString)
+                           .order(messageTimestamp.desc)
+                           .limit(limit)
+        
+        var tempList: [Message] = []
+        
+        for row in try db.prepare(query) {
+            // Only create metadata if at least one field has a value
+            let metadata: MessageMetadata?
+            if row[messageModel] != nil || row[messageProvider] != nil || 
+               row[messageResponseTime] != nil || row[messagePromptTokens] != nil ||
+               row[messageResponseTokens] != nil || row[messageTotalTokens] != nil {
+                metadata = MessageMetadata(
+                    model: row[messageModel],
+                    provider: row[messageProvider] != nil ? LLMProvider(rawValue: row[messageProvider]!) : nil,
+                    responseTime: row[messageResponseTime],
+                    promptTokens: row[messagePromptTokens],
+                    responseTokens: row[messageResponseTokens],
+                    totalTokens: row[messageTotalTokens]
+                )
+            } else {
+                metadata = nil
+            }
+            
+            let message = Message(
+                id: UUID(uuidString: row[messageId])!,
+                chatId: UUID(uuidString: row[messageChatId])!,
+                content: row[messageContent],
+                isUser: row[messageIsUser],
+                timestamp: row[messageTimestamp],
+                imageData: row[messageImageData],
+                metadata: metadata,
+                status: MessageStatus(rawValue: row[messageStatus])!,
+                editedAt: row[messageEditedAt]
+            )
+            tempList.append(message)
+        }
+        
+        // Reverse to maintain chronological order (oldest to newest)
+        messageList = tempList.reversed()
+        
+        return messageList
+    }
+    
     func deleteMessage(id: UUID) async throws {
         guard let db = db else { throw DatabaseError.connectionFailed }
         
