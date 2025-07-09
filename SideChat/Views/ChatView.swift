@@ -11,6 +11,7 @@ struct ChatView: View {
     
     @ObservedObject var viewModel: ChatViewModel
     @State private var userIsScrolling = false
+    @State private var refreshID = UUID()
     
     // MARK: - Body
     
@@ -29,8 +30,18 @@ struct ChatView: View {
                     // Messages container with lazy loading for performance
                     LazyVStack(spacing: 12) {
                         ForEach(viewModel.messages) { message in
-                            ChatBubbleView(message: message)
-                                .id(message.id)
+                            ChatBubbleView(
+                                message: message,
+                                onDelete: {
+                                    // Delay to allow context menu to dismiss properly
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                        viewModel.deleteMessage(id: message.id)
+                                        // Force view refresh to reset context menu state
+                                        refreshID = UUID()
+                                    }
+                                }
+                            )
+                            .id(message.id)
                         }
                         
                         // Typing indicator
@@ -39,6 +50,7 @@ struct ChatView: View {
                                 .id("typing-indicator")
                         }
                     }
+                    .id(refreshID) // Force refresh when ID changes
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     .padding(.bottom, 8)

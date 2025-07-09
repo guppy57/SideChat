@@ -10,9 +10,15 @@ struct ChatBubbleView: View {
     // MARK: - Properties
     
     let message: Message
+    let onDelete: (() -> Void)?
     @Default(.colorTheme) private var colorTheme
     @Default(.fontSize) private var fontSize
     @Default(.enableMarkdownRendering) private var enableMarkdownRendering
+    
+    init(message: Message, onDelete: (() -> Void)? = nil) {
+        self.message = message
+        self.onDelete = onDelete
+    }
     
     
     // MARK: - Body
@@ -123,6 +129,14 @@ struct ChatBubbleView: View {
             if enableMarkdownRendering {
                 Button(action: copyAsMarkdown) {
                     Label("Copy as Markdown", systemImage: "doc.richtext")
+                }
+            }
+            
+            if let onDelete = onDelete {
+                Divider()
+                
+                Button(role: .destructive, action: onDelete) {
+                    Label("Delete", systemImage: "trash")
                 }
             }
         }
